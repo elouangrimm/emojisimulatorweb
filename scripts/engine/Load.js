@@ -12,6 +12,7 @@
     let path; // Use let
     let simDataSource = null;
 
+    /*
     // Local or Remote or URL?
     var local, lz, url;
     if ((local = getParameterByName("s"))) {
@@ -27,6 +28,7 @@
     } else {
         path = "models/blank.json";
     }
+    */
 
     const lz = getParameterByName("lz");
     const local = getParameterByName("s");

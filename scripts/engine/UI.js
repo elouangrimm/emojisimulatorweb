@@ -257,7 +257,7 @@ var changeTiles = function(){
         Save.updateURL();
 	}
 
-};
+}
 
 ////////////////////////////
 //// MAKE IT SCRUBBABLE ////
