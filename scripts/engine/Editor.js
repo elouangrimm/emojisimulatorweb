@@ -527,8 +527,141 @@
         let sliders = [];
 
         const populate = () => {
-            /* ... implementation ... */
-        }; // Keep full implementation
+            console.log("Proportions populate called");
+            dom.innerHTML = ""; // Clear
+            sliders = [];
+            // Guard clause for model data readiness
+            if (!Model.data?.world?.proportions || !Model.data?.states) {
+                 console.warn("Proportions: Model data not ready for populate.");
+                 dom.innerHTML = "[State data loading...]"; // Placeholder
+                 return;
+            }
+            const proportions = Model.data.world.proportions;
+            const states = Model.data.states;
+
+            // --- Sync proportions with states ---
+            const oldProportionsMap = new Map(proportions.map((p) => [p.stateID, p.parts]));
+            const newProportions = states.map((state) => ({
+                stateID: state.id,
+                parts: oldProportionsMap.get(state.id) || 0
+            }));
+            proportions.length = 0; // Clear original array in place
+            Array.prototype.push.apply(proportions, newProportions); // Push new items
+            // --- End Sync ---
+
+
+            let totalParts = proportions.reduce((sum, p) => sum + p.parts, 0);
+            if (totalParts <= 0 && proportions.length > 0) {
+                 console.warn("Proportions: Total parts zero, normalizing.");
+                 totalParts = proportions.length;
+                 proportions.forEach(p => p.parts = 1);
+            } else if (proportions.length === 0) {
+                console.warn("Proportions: No states/proportions to display.");
+                 dom.innerHTML = "[No states defined]";
+                 return;
+            }
+
+
+            proportions.forEach((proportion, index) => {
+                const state = Model.getStateByID(proportion.stateID);
+                if (!state) {
+                     console.warn(`Proportions: State not found for ID ${proportion.stateID}`);
+                     return; // Skip if state is missing
+                }
+
+                const lineDOM = document.createElement("div");
+                dom.appendChild(lineDOM);
+
+                const iconDOM = document.createElement("span");
+                iconDOM.innerHTML = state.icon || '▫️';
+                iconDOM.title = state.name || '[unnamed]';
+                lineDOM.appendChild(iconDOM);
+
+                const slider = document.createElement("input");
+                slider.type = "range"; slider.min = 0; slider.max = 100; slider.step = 1;
+                // Normalize initial value based on *current* total parts
+                slider.value = totalParts > 0 ? Math.round((proportion.parts / totalParts) * 100) : 0;
+                // Update model proportion based on *initial normalized* value (important!)
+                proportion.parts = parseFloat(slider.value);
+
+                slider.dataset.index = index;
+                sliders.push(slider);
+                lineDOM.appendChild(slider);
+
+                let snapshot = [];
+                slider.onmousedown = function () {
+                    snapshot = sliders.map((s) => parseFloat(s.value));
+                };
+
+                slider.oninput = function () { // Keep the complex update logic from before
+                    const currentIndex = parseInt(this.dataset.index);
+                    const currentValue = parseFloat(this.value);
+                    if (isNaN(currentValue)) return; // Safety check
+
+                    const oldValue = snapshot[currentIndex];
+                    if (isNaN(oldValue)) { // Initialize snapshot if needed
+                         snapshot = sliders.map((s) => parseFloat(s.value));
+                    }
+                    // const delta = currentValue - oldValue; // Delta not directly needed
+
+                    let otherTotalSnapshot = 0;
+                    snapshot.forEach((val, i) => {
+                        if (i !== currentIndex && !isNaN(val)) otherTotalSnapshot += val;
+                    });
+
+                    let scale = 1;
+                    if (otherTotalSnapshot > 0) {
+                        scale = (100 - currentValue) / otherTotalSnapshot;
+                    } else if (sliders.length > 1) {
+                        // Distribute remaining evenly ONLY if others were actually zero in snapshot
+                        const remainingValue = Math.round((100 - currentValue) / (sliders.length - 1));
+                        sliders.forEach((s, i) => {
+                            if (i !== currentIndex) {
+                                s.value = remainingValue;
+                                if (Model.data.world.proportions[i]) Model.data.world.proportions[i].parts = remainingValue;
+                            }
+                        });
+                        if (Model.data.world.proportions[currentIndex]) Model.data.world.proportions[currentIndex].parts = currentValue;
+                        normalizeProportions(); // Recalculate and normalize fully
+                        Grid.reinitialize();
+                        window.hasUnsavedChanges = true;
+                        Save.updateURL();
+                        return; // Exit early
+                    }
+
+                    // Apply scaling based on snapshot
+                    let currentAppliedTotal = currentValue;
+                    sliders.forEach((s, i) => {
+                        if (i !== currentIndex) {
+                            const snapshotValue = isNaN(snapshot[i]) ? 0 : snapshot[i]; // Handle NaN in snapshot
+                            const scaledValue = Math.round(snapshotValue * scale);
+                            s.value = scaledValue;
+                            if (Model.data.world.proportions[i]) Model.data.world.proportions[i].parts = scaledValue;
+                            currentAppliedTotal += scaledValue;
+                        } else {
+                             if (Model.data.world.proportions[i]) Model.data.world.proportions[i].parts = currentValue;
+                        }
+                    });
+
+                     // Adjust rounding errors
+                     normalizeProportions(); // Call normalize which handles rounding
+
+                    Grid.reinitialize();
+                    window.hasUnsavedChanges = true;
+                    Save.updateURL();
+                };
+            }); // End forEach proportion
+
+             // Final normalization after initial populate based on normalized slider values
+             normalizeProportions();
+
+            // Disable slider if only one state
+            if (sliders.length === 1) {
+                sliders[0].value = 100;
+                sliders[0].disabled = true;
+                if (Model.data.world.proportions[0]) Model.data.world.proportions[0].parts = 100;
+            }
+        };
         const normalizeProportions = () => {
             if (!Model.data.world || !Model.data.world.proportions) return;
             const props = Model.data.world.proportions;
