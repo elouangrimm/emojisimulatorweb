@@ -65,7 +65,7 @@ div, input, select, textarea, button {
 	/* ... other editor_container styles ... */
 	position: relative;
 	/* Important for perfect-scrollbar */
-	overflow: hidden;
+	overflow: hidden !important;
 }
 
 #editor_resizer {
@@ -184,28 +184,30 @@ THE GRID
 /* #grid_bg is now handled by #grid_container */
 
 .ps-container {
-	/* Apply this to #editor_container's child */
-	height: 100%;
-	width: 100%;
+	/* Apply this class via JS if needed, or target #editor directly */
+	-ms-touch-action: none;
+	touch-action: none;
 	overflow: hidden !important;
-	/* Override default */
 	position: relative;
-	/* Needed for scrollbar positioning */
 }
 
 /***************
 THE EDITOR
 ***************/
 #editor {
-	padding: 20px;
-	/* Adjusted padding */
-	margin: 0;
-	/* Remove margin */
+	/* This should be the direct child */
 	height: 100%;
-	overflow: hidden;
-	font-size: 14px;
-	/* Base font size for editor text */
-	line-height: 1.6;
+	/* MUST have height for Ps */
+	width: 100%;
+	/* MUST have width */
+	overflow: hidden !important;
+	/* Ps adds its own scrollbars */
+	padding: 20px;
+	/* Keep padding */
+	box-sizing: border-box;
+	/* Include padding in size */
+	position: relative;
+	/* Might help Ps */
 }
 
 #editor .editor_title {
@@ -258,43 +260,57 @@ THE EDITOR
 }
 
 #editor .editor_state_header {
-    display: flex;
-    align-items: baseline; /* Align text baselines */
-    gap: 5px;
-    margin-bottom: 5px; /* Less space */
+	display: flex;
+	align-items: baseline;
+	/* Align text baselines */
+	gap: 5px;
+	margin-bottom: 5px;
+	/* Less space */
 }
+
 #editor input.editor_icon {
-    font-size: 24px; /* Slightly smaller icon maybe */
-    width: 36px;
-    height: 36px;
-    line-height: 34px; /* Adjust for border */
-    margin-right: 5px; /* Less space */
-    /* Revert M3 styles if desired */
-    background: #eee;
-    border: 1px solid #ccc;
-    border-radius: 3px;
+	font-size: 24px;
+	/* Slightly smaller icon maybe */
+	width: 36px;
+	height: 36px;
+	line-height: 34px;
+	/* Adjust for border */
+	margin-right: 5px;
+	/* Less space */
+	/* Revert M3 styles if desired */
+	background: #eee;
+	border: 1px solid #ccc;
+	border-radius: 3px;
 }
+
 #editor input[type=text].editor_name {
-    font-size: 16px; /* Smaller name */
-    height: 30px; /* Shorter input */
-    padding: 2px 5px;
-    flex-grow: 1; /* Keep taking space */
-     border: 1px solid #ccc;
-     border-radius: 3px;
-     background-color: #fff;
+	font-size: 16px;
+	/* Smaller name */
+	height: 30px;
+	/* Shorter input */
+	padding: 2px 5px;
+	flex-grow: 1;
+	/* Keep taking space */
+	border: 1px solid #ccc;
+	border-radius: 3px;
+	background-color: #fff;
 }
+
 #editor div.delete_state {
-    width: 25px; /* Smaller */
-    height: 25px;
-    font-size: 20px; /* Smaller icon */
-    line-height: 25px;
-    opacity: 0.3;
-    color: #000;
-    margin-left: 5px;
-    align-self: center; /* Center vertically */
-    /* Revert M3 styles */
-    border-radius: 0;
-    background: none;
+	width: 25px;
+	/* Smaller */
+	height: 25px;
+	font-size: 20px;
+	/* Smaller icon */
+	line-height: 25px;
+	opacity: 0.3;
+	color: #000;
+	margin-left: 5px;
+	align-self: center;
+	/* Center vertically */
+	/* Revert M3 styles */
+	border-radius: 0;
+	background: none;
 }
 
 #editor div.delete_state:hover {
@@ -380,17 +396,26 @@ THE EDITOR
 	/* Match text */
 }
 
-#editor li > span, /* Labels */
-#editor li > div:not(.delete_action):not(.editor_new_action_container) /* Action UI containers */
- {
-    margin-left: 0px; /* Remove forced indent */
-    flex-grow: 0; /* Don't force grow */
-    display: inline; /* Ensure inline */
-    margin-right: 4px; /* Space after labels */
+#editor li>span,
+/* Labels */
+#editor li>div:not(.delete_action):not(.editor_new_action_container)
+
+/* Action UI containers */
+	{
+	margin-left: 0px;
+	/* Remove forced indent */
+	flex-grow: 0;
+	/* Don't force grow */
+	display: inline;
+	/* Ensure inline */
+	margin-right: 4px;
+	/* Space after labels */
 }
-#editor li > select,
-#editor li > input[type=text].editor_number {
-    margin-left: 0; /* Remove extra space */
+
+#editor li>select,
+#editor li>input[type=text].editor_number {
+	margin-left: 0;
+	/* Remove extra space */
 }
 
 #editor li>div.delete_action {
@@ -422,40 +447,56 @@ THE EDITOR
 }
 
 #editor li>div.delete_action:hover {
-	opacity: 0.6; /* Original hover */
-    background-color: transparent;
+	opacity: 0.6;
+	/* Original hover */
+	background-color: transparent;
 }
 
 #editor .editor_new_action_container {
-	margin-left: -25px; /* Align with delete button */
-	display: block; /* Put on its own line potentially */
+	margin-left: -25px;
+	/* Align with delete button */
+	display: block;
+	/* Put on its own line potentially */
 	margin-top: 5px;
 }
-#editor .editor_new_action_select { /* Target the select directly */
-   /* Reset M3 styles */
-   opacity: 1;
-   position: static;
-   width: auto;
-   height: auto;
-   padding: 2px 5px; /* Minimal padding */
-   border: 1px solid #aaa; /* Simple border */
-   border-radius: 3px; /* Slight rounding */
-   font-family: inherit;
-   font-weight: normal; /* Normal weight */
-   font-size: 12px; /* Smaller like original? */
-   line-height: normal;
-   color: #555; /* Grey text */
-   background-color: #f0f0f0; /* Light grey background */
-   cursor: pointer;
-   transition: background-color 0.2s;
-   -webkit-appearance: none;
-   -moz-appearance: none;
-   appearance: none;
-   background-image: none; /* Remove arrow */
-   display: inline-block; /* Make inline */
+
+#editor .editor_new_action_select {
+	/* Target the select directly */
+	/* Reset M3 styles */
+	opacity: 1;
+	position: static;
+	width: auto;
+	height: auto;
+	padding: 2px 5px;
+	/* Minimal padding */
+	border: 1px solid #aaa;
+	/* Simple border */
+	border-radius: 3px;
+	/* Slight rounding */
+	font-family: inherit;
+	font-weight: normal;
+	/* Normal weight */
+	font-size: 12px;
+	/* Smaller like original? */
+	line-height: normal;
+	color: #555;
+	/* Grey text */
+	background-color: #f0f0f0;
+	/* Light grey background */
+	cursor: pointer;
+	transition: background-color 0.2s;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	appearance: none;
+	background-image: none;
+	/* Remove arrow */
+	display: inline-block;
+	/* Make inline */
 }
+
 #editor .editor_new_action_select:hover {
-   background-color: #e0e0e0; /* Darker grey hover */
+	background-color: #e0e0e0;
+	/* Darker grey hover */
 }
 
 /* Add Action Button */
@@ -544,53 +585,74 @@ THE EDITOR
 
 /* Generic Fancy Button */
 #editor .editor_fancy_button {
-	border-radius: 3px; /* Less rounded */
-    min-width: auto; /* Remove min width */
-    width: auto; /* Auto width */
-    padding: 5px 10px; /* Smaller padding */
-    height: auto; /* Auto height */
-    background: #ddd; /* Grey background */
-    font-weight: normal; /* Normal weight */
-    font-size: 14px; /* Adjust size */
-    line-height: normal; /* Normal line height */
-    color: #333; /* Dark text */
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    text-align: left; /* Align text left */
-    border: 1px solid #ccc; /* Add border */
-    transition: background-color 0.2s;
-    margin-bottom: 10px; /* Adjust spacing */
-    box-shadow: none; /* Remove shadow */
+	border-radius: 3px;
+	/* Less rounded */
+	min-width: auto;
+	/* Remove min width */
+	width: auto;
+	/* Auto width */
+	padding: 5px 10px;
+	/* Smaller padding */
+	height: auto;
+	/* Auto height */
+	background: #ddd;
+	/* Grey background */
+	font-weight: normal;
+	/* Normal weight */
+	font-size: 14px;
+	/* Adjust size */
+	line-height: normal;
+	/* Normal line height */
+	color: #333;
+	/* Dark text */
+	cursor: pointer;
+	display: inline-flex;
+	align-items: center;
+	text-align: left;
+	/* Align text left */
+	border: 1px solid #ccc;
+	/* Add border */
+	transition: background-color 0.2s;
+	margin-bottom: 10px;
+	/* Adjust spacing */
+	box-shadow: none;
+	/* Remove shadow */
 }
+
 #editor .editor_fancy_button:hover {
-    background: #ccc; /* Darker grey hover */
-    box-shadow: none;
+	background: #ccc;
+	/* Darker grey hover */
+	box-shadow: none;
 }
+
 /* Icon inside button */
 #editor .editor_fancy_button span.button-icon {
-    font-size: 16px; /* Adjust icon size */
-    margin-right: 5px; /* Space */
-    /* Reset M3 specifics */
-    border-right: none;
-    line-height: inherit;
-    height: auto;
-    float: none;
-    display: inline;
-    text-align: center;
-    position: static;
+	font-size: 16px;
+	/* Adjust icon size */
+	margin-right: 5px;
+	/* Space */
+	/* Reset M3 specifics */
+	border-right: none;
+	line-height: inherit;
+	height: auto;
+	float: none;
+	display: inline;
+	text-align: center;
+	position: static;
 }
 
 #editor .editor_fancy_button#save_local_button,
 #editor .editor_fancy_button#export_model_button,
 #editor .editor_fancy_button#import_model_button {
-    background: #ddd; /* Revert to grey */
-    color: #333;
+	background: #ddd;
+	/* Revert to grey */
+	color: #333;
 }
+
 #editor .editor_fancy_button#save_local_button:hover,
 #editor .editor_fancy_button#export_model_button:hover,
 #editor .editor_fancy_button#import_model_button:hover {
-    background: #ccc;
+	background: #ccc;
 }
 
 
@@ -841,24 +903,47 @@ THE PLAY CONTROLS
 	color: #1d192b;
 	/* On Primary Container */
 	border: 1px solid #cac4d0;
-	border-radius: 20px;
-	/* Pill shape */
-	padding: 0 15px;
-	/* Horizontal padding */
+	border-radius: 50%;
+	/* Make buttons circular */
+	/* padding: 0 15px; */
+	/* Remove padding */
+	width: 40px;
+	/* Fixed width for circle */
 	height: 40px;
-	/* Match container height */
-	line-height: 38px;
-	/* Adjust for border */
-	text-align: center;
-	font-weight: 500;
-	/* Medium */
-	font-size: 14px;
+	/* line-height: 38px; */
+	/* Remove line-height */
+	/* text-align: center; */
+	/* Handled by flex */
+	font-weight: normal;
+	/* Icons don't need weight */
+	font-size: 20px;
+	/* Icon size */
 	transition: background-color 0.2s;
 	cursor: pointer;
-	display: flex;
-	/* Align icon inside */
+	display: inline-flex;
+	/* Use inline-flex */
 	align-items: center;
 	justify-content: center;
+	/* Reset specific widths */
+}
+
+#play_controls>.control_button>.material-symbols-outlined {
+	font-size: 24px;
+	/* Material symbol size */
+	line-height: 1;
+	display: block;
+	width: 24px;
+	/* Match icon size */
+	height: 24px;
+	/* Match icon size */
+	overflow: hidden;
+	/* Hide text overflow if any */
+	font-variation-settings:
+		/* Optional: Fine-tune icon style */
+		'FILL'0,
+		'wght'400,
+		'GRAD'0,
+		'opsz'24;
 }
 
 #play_controls>.control_button:hover {
@@ -875,58 +960,57 @@ THE PLAY CONTROLS
 /* Speed Control */
 #play_controls>.control_speed {
 	width: 130px;
-	/* Even wider for labels */
 	height: 40px;
-	/* Ensure height matches buttons */
+	/* Ensure consistent height */
 	display: flex;
 	flex-direction: column;
-	/* Stack input and labels */
 	align-items: center;
 	justify-content: center;
-	/* Center vertically */
-	margin: 0 5px;
-	padding-top: 2px;
-	/* Add a bit of top padding */
+	margin: 0 8px;
+	/* Consistent margin */
+	padding: 0;
+	/* Remove padding */
 	box-sizing: border-box;
+	visibility: visible;
+	/* Explicitly visible */
+	opacity: 1;
+	/* Explicitly opaque */
 }
 
 #play_controls>.control_speed>input[type=range] {
 	width: 100%;
 	height: 8px;
-	/* Explicit height */
-	margin: 0 0 2px 0;
-	/* Margin below slider */
+	margin: 0 0 4px 0;
+	/* Add margin below */
 	cursor: pointer;
-	/* Appearance styles already defined, ensure they are correct */
 	-webkit-appearance: none;
 	appearance: none;
 	background: #d9d4de;
 	border-radius: 4px;
 	outline: none;
 	display: block;
-	/* Ensure it's block */
+	/* Make sure it's block */
+	visibility: visible;
+	/* Explicitly visible */
+	opacity: 1;
+	/* Explicitly opaque */
 }
 
-/* Ensure thumbs are styled correctly */
+/* Thumb styles should already be defined - check them */
 #play_controls>.control_speed>input[type=range]::-webkit-slider-thumb {
-	-webkit-appearance: none;
-	appearance: none;
-	width: 16px;
-	height: 16px;
-	background: #6750a4;
-	border-radius: 50%;
-	cursor: pointer;
-	margin-top: -4px;
-	/* Adjust vertical alignment if needed */
+	/* ... keep thumb styles ... */
+	visibility: visible;
+	/* Explicitly visible */
+	opacity: 1;
+	/* Explicitly opaque */
 }
 
 #play_controls>.control_speed>input[type=range]::-moz-range-thumb {
-	width: 16px;
-	height: 16px;
-	background: #6750a4;
-	border-radius: 50%;
-	cursor: pointer;
-	border: none;
+	/* ... keep thumb styles ... */
+	visibility: visible;
+	/* Explicitly visible */
+	opacity: 1;
+	/* Explicitly opaque */
 }
 
 #play_controls>.control_speed>.speed_labels {
@@ -935,12 +1019,17 @@ THE PLAY CONTROLS
 	width: 100%;
 	font-size: 11px;
 	color: #49454f;
-	/* margin-top: 2px; */
-	/* Removed, spacing handled by container */
 	padding: 0 2px;
-	/* Small padding for labels */
 	line-height: 1;
-	/* Prevent extra height */
+	visibility: visible;
+	/* Explicitly visible */
+	opacity: 1;
+	/* Explicitly opaque */
+}
+
+/* Ensure float is removed from labels if it was there */
+#play_controls>.control_speed>.speed_labels>div {
+	float: none !important;
 }
 
 /* Specific Button Widths (Removed - use padding) */
@@ -948,6 +1037,43 @@ THE PLAY CONTROLS
 /* #play_controls > #play_pause { width: 50px; } */
 /* #play_controls > #play_step { width: 40px; } */
 /* #play_controls > #play_draw { width: 80px; } */
+
+#play_controls>#play_draw {
+	/* Keep general button styles */
+	display: inline-flex;
+	/* Align items */
+	align-items: center;
+	width: auto;
+	/* Auto width */
+	padding: 0 10px 0 5px;
+	/* Adjust padding L/R */
+	border-radius: 20px;
+	/* Keep pill shape for this one? */
+}
+
+#play_controls>#play_draw>.material-symbols-outlined {
+	margin-right: 5px;
+	/* Space between icon and emoji */
+}
+
+#play_controls>#play_draw>#play_draw_icon_container {
+	width: 26px;
+	height: 26px;
+	border: 1px solid #79747e;
+	font-size: 20px;
+	border-radius: 4px;
+	line-height: 24px;
+	/* Adjust for border */
+	text-align: center;
+	/* margin-left: 8px; */
+	/* Removed, use gap on parent? */
+	background: #fffbfe;
+	display: inline-flex;
+	justify-content: center;
+	align-items: center;
+	overflow: hidden;
+	/* Hide overflowing emoji parts */
+}
 
 
 /* Paused state */
@@ -957,6 +1083,11 @@ THE PLAY CONTROLS
 	color: #ffffff;
 	/* On Primary */
 	border-color: #6750a4;
+}
+
+#play_controls>#play_pause[paused=true]>.material-symbols-outlined {
+	color: #ffffff;
+	/* Ensure icon is white too */
 }
 
 #play_controls>#play_pause[paused=true]:hover {

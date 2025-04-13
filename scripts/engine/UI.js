@@ -56,27 +56,28 @@
             css.innerHTML = "#grid_bg{ display:none; } #grid{color:#1c1b1f}"; // Use M3 text color
     }
 
-	const editorContainer = document.getElementById('editor_container');
-    const gridContainer = document.getElementById('grid_container'); // Get grid container too
-    const resizer = document.getElementById('editor_resizer');
+    const editorContainer = document.getElementById("editor_container");
+    const gridContainer = document.getElementById("grid_container"); // Get grid container too
+    const resizer = document.getElementById("editor_resizer");
 
     let isResizing = false;
     let startX = 0;
     let initialEditorWidth = 0;
     const minEditorWidth = 280; // Minimum pixel width for editor
 
-    if (resizer && editorContainer && gridContainer) { // Check if elements exist
+    if (resizer && editorContainer && gridContainer) {
+        // Check if elements exist
 
-        resizer.addEventListener('mousedown', (e) => {
+        resizer.addEventListener("mousedown", (e) => {
             if (e.button !== 0) return; // Only main button
             isResizing = true;
             startX = e.clientX;
             initialEditorWidth = editorContainer.offsetWidth;
-            document.body.classList.add('is-resizing'); // Add class to prevent selection
+            document.body.classList.add("is-resizing"); // Add class to prevent selection
 
             // Attach listeners to window for dragging anywhere
-            window.addEventListener('mousemove', handleMouseMove);
-            window.addEventListener('mouseup', handleMouseUp);
+            window.addEventListener("mousemove", handleMouseMove);
+            window.addEventListener("mouseup", handleMouseUp);
 
             e.preventDefault(); // Prevent default drag behavior
         });
@@ -90,7 +91,10 @@
 
             // Apply constraints
             const maxEditorWidth = window.innerWidth * 0.7; // Example: max 70% of window
-            newEditorWidth = Math.max(minEditorWidth, Math.min(newEditorWidth, maxEditorWidth));
+            newEditorWidth = Math.max(
+                minEditorWidth,
+                Math.min(newEditorWidth, maxEditorWidth)
+            );
 
             // Apply styles for flexbox resizing
             editorContainer.style.flexBasis = `${newEditorWidth}px`;
@@ -99,45 +103,47 @@
             triggerDebouncedResize();
 
             // Prevent default text selection behavior which can interfere
-             e.preventDefault();
+            e.preventDefault();
         };
 
         const handleMouseUp = (e) => {
             if (isResizing) {
                 isResizing = false;
-                document.body.classList.remove('is-resizing'); // Remove class
+                document.body.classList.remove("is-resizing"); // Remove class
 
                 // Remove window listeners
-                window.removeEventListener('mousemove', handleMouseMove);
-                window.removeEventListener('mouseup', handleMouseUp);
+                window.removeEventListener("mousemove", handleMouseMove);
+                window.removeEventListener("mouseup", handleMouseUp);
 
                 // --- Trigger final resize ---
                 triggerDebouncedResize(true); // Force immediate trigger on mouse up
 
                 // Update Perfect Scrollbar if it exists
                 if (window.Ps && editorContainer) {
-                    try { Ps.update(editorContainer); } catch(err){}
+                    try {
+                        Ps.update(editorContainer);
+                    } catch (err) {}
                 }
-                 console.log("Resizing ended.");
+                console.log("Resizing ended.");
             }
         };
 
         // --- Debounced Resize Publisher ---
         let resizeDebounceTimeout = null;
         const triggerDebouncedResize = (immediate = false) => {
-             clearTimeout(resizeDebounceTimeout);
-             const delay = immediate ? 0 : 50; // Shorter delay during drag, immediate on mouseup
-             resizeDebounceTimeout = setTimeout(() => {
-                  // console.log("Publishing ui/resize"); // Debug log
-                  publish("ui/resize"); // Publish event for grid etc.
-                   // Update Perfect Scrollbar after resize calculation is done
-                  if (window.Ps && editorContainer) {
-                       try { Ps.update(editorContainer); } catch(err){}
-                  }
-             }, delay);
+            clearTimeout(resizeDebounceTimeout);
+            const delay = immediate ? 0 : 50; // Shorter delay during drag, immediate on mouseup
+            resizeDebounceTimeout = setTimeout(() => {
+                // console.log("Publishing ui/resize"); // Debug log
+                publish("ui/resize"); // Publish event for grid etc.
+                // Update Perfect Scrollbar after resize calculation is done
+                if (window.Ps && editorContainer) {
+                    try {
+                        Ps.update(editorContainer);
+                    } catch (err) {}
+                }
+            }, delay);
         };
-
-
     } else {
         console.warn("Resizer elements not found, resizing disabled.");
     }
@@ -165,18 +171,58 @@
     // PLAY/PAUSE
     const play_pause = document.getElementById("play_pause");
     const updatePauseUI = function () {
-        // Define before use
         if (!play_pause) return;
-        if (Model.isPlaying) {
-            play_pause.innerHTML = "pause";
-            play_pause.setAttribute("paused", "false"); // Use strings for attributes
+        const isPlaying = window.Model ? Model.isPlaying : false;
+        // Get the icon span inside the button
+        const iconSpan = play_pause.querySelector(".material-symbols-outlined");
+        if (!iconSpan) return; // Exit if span not found
+
+        if (isPlaying) {
+            // play_pause.innerHTML = "pause"; // Remove text setting
+            iconSpan.textContent = "pause"; // Set icon name
+            play_pause.setAttribute("paused", "false");
             play_pause.title = "Pause Simulation";
         } else {
-            play_pause.innerHTML = "play";
+            iconSpan.textContent = "play_arrow"; // Set icon name
             play_pause.setAttribute("paused", "true");
             play_pause.title = "Play Simulation";
         }
     };
+
+    const play_draw_icon_container = document.getElementById(
+        "play_draw_icon_container"
+    );
+
+    // Inside _updateBrushIcon
+    const _updateBrushIcon = function () {
+        // Use the container found above
+        if (!play_draw_icon_container || !Model.data || !Model.data.meta)
+            return;
+
+        const state = Model.getStateByID(Model.data.meta.draw);
+        if (state) {
+            play_draw_icon_container.innerHTML = state.icon || "?"; // Set emoji in container
+            play_draw.title = `Drawing: ${state.name} (${state.icon || "?"})`;
+        } else {
+            play_draw_icon_container.innerHTML = " "; // Blank if state not found
+            play_draw.title = "Select Draw Brush";
+            // Resetting logic...
+        }
+    };
+
+    // Inside play_draw.onclick, update reference if needed (or just use container directly)
+    if (play_draw) {
+        play_draw.onclick = function () {
+            // ... (logic to get next state) ...
+            if (nextState) {
+                Model.data.meta.draw = nextState.id;
+                _updateBrushIcon(); // Update brush icon display
+                // window.hasUnsavedChanges = true; // Maybe don't mark brush change as needing save
+                // Save.updateURL();
+            }
+        };
+    }
+
     if (play_pause) {
         play_pause.onclick = function () {
             Model.isPlaying = !Model.isPlaying;
@@ -557,27 +603,27 @@
     if (editor_container) {
         // Initialize Perfect Scrollbar if the container exists
         try {
+            // Ensure Ps is initialized on the CONTAINER
             Ps.initialize(editor_container, {
                 suppressScrollX: true,
-                wheelSpeed: 0.7, // Adjust speed if needed
-                minScrollbarLength: 20,
+                wheelSpeed: 0.7,
+                minScrollbarLength: 20
             });
 
-            // Update scrollbar on window resize
-            window.addEventListener("resize", function () {
-                Ps.update(editor_container);
-            });
-
-            // Update scrollbar when model initializes (content might change height)
-            subscribe("/model/init", function () {
-                Ps.update(editor_container);
-            });
-
-            // Scroll to top and update on reset
-            subscribe("/meta/reset", function () {
+            // Ensure updates happen (resize, model init, reset)
+            // These listeners should already be present from previous steps
+            window.addEventListener("resize", function(){ Ps.update(editor_container); });
+            subscribe("/model/init", function(){ Ps.update(editor_container); });
+            subscribe("/meta/reset/complete", function(){ // Use correct event
                 editor_container.scrollTop = 0;
                 Ps.update(editor_container);
             });
+            // Add update after rebuild too
+            subscribe("/model/load/success", function(){ // When model is loaded
+                editor_container.scrollTop = 0; // Scroll to top
+                 Ps.update(editor_container);
+            });
+
         } catch (e) {
             console.error("Failed to initialize Perfect Scrollbar:", e);
             // Fallback to native scrollbar
@@ -601,17 +647,23 @@
         false
     );
 
-	let windowResizeTimeout;
-     window.addEventListener("resize", function(){
-         clearTimeout(windowResizeTimeout);
-         windowResizeTimeout = setTimeout(() => {
-             publish("ui/resize"); // Grid and other components listen to this
+    let windowResizeTimeout;
+    window.addEventListener(
+        "resize",
+        function () {
+            clearTimeout(windowResizeTimeout);
+            windowResizeTimeout = setTimeout(() => {
+                publish("ui/resize"); // Grid and other components listen to this
 
-             // Explicitly update scrollbar on window resize too
-             if (window.Ps && editorContainer) {
-                  try { Ps.update(editorContainer); } catch(err) {}
-             }
-             console.log("Window resized, updated UI.");
-         }, 150);
-     }, false);
+                // Explicitly update scrollbar on window resize too
+                if (window.Ps && editorContainer) {
+                    try {
+                        Ps.update(editorContainer);
+                    } catch (err) {}
+                }
+                console.log("Window resized, updated UI.");
+            }, 150);
+        },
+        false
+    );
 })(window); // End of UI module IIFE
