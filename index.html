@@ -1,79 +1,91 @@
-<!doctype>
+<!DOCTYPE html>
 <html>
-<head>
-	
-	<!-- Meta -->
-	<title>Emoji Simulator! 😘</title>
-	<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
-	<meta content="utf-8" http-equiv="encoding">
-	<link rel="icon" type="image/png" href="favicon.png">
+    <head>
+        <!-- Meta -->
+        <title>Emoji Simulator</title>
+        <meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
+        <meta content="utf-8" http-equiv="encoding" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" type="image/png" href="favicon.png" />
 
-	<!-- Styles -->
-	<link rel="stylesheet" type="text/css" href="styles/model.css">
-	<link rel="stylesheet" type="text/css" href="styles/perfect-scrollbar.min.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap"
+            rel="stylesheet"
+        />
 
-	<!-- Schema.org markup for Google+ -->
-	<meta itemprop="name" content="Emoji Simulator! 😘">
-	<meta itemprop="description" content="A tool to make cellular automata, with emoji">
-	<meta itemprop="image" content="https://ncase.me/sim/thumb.png">
+        <!-- Styles -->
+        <link
+            rel="stylesheet"
+            type="text/css"
+            href="styles/perfect-scrollbar.min.css"
+        />
+        <link rel="stylesheet" type="text/css" href="styles/model.css" />
 
-	<!-- Twitter Card data -->
-	<meta name="twitter:card" content="summary_large_image">
-	<meta name="twitter:site" content="@ncasenmare">
-	<meta name="twitter:title" content="Emoji Simulator! 😘">
-	<meta name="twitter:description" content="A tool to make cellular automata, with emoji">
-	<meta name="twitter:creator" content="@ncasenmare">
-	<meta name="twitter:image" content="https://ncase.me/sim/thumb.png">
+        <!-- Open Graph data -->
+        <meta property="og:title" content="Emoji Simulator! 😘" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://ncase.me/sim/" />
+        <meta property="og:image" content="https://ncase.me/sim/thumb.png" />
+        <meta
+            property="og:description"
+            content="A tool to make cellular automata, with emoji"
+        />
+    </head>
+    <body>
+        <!-- The grid. Inline CSS so grid can change, shuddup. -->
+        <style id="ui_style"></style>
+        <style id="grid_style"></style>
+        <div id="grid_container">
+            <div id="grid_bg"></div>
+            <div id="grid"></div>
+        </div>
 
-	<!-- Open Graph data -->
-	<meta property="og:title" content="Emoji Simulator! 😘">
-	<meta property="og:type" content="website">
-	<meta property="og:url" content="https://ncase.me/sim/">
-	<meta property="og:image" content="https://ncase.me/sim/thumb.png">
-	<meta property="og:description" content="A tool to make cellular automata, with emoji">
+        <!-- The big honkin' editor -->
+        <div id="editor_container">
+            <div id="editor"></div>
+        </div>
 
-</head>
-<body>
+        <!-- Play/Pause/Reset/Step/Draw controls -->
+        <div id="play_container">
+            <div id="play_controls">
+                <!-- New Board -->
+                <div class="control_button" id="play_reset">reset</div>
+                <div class="control_divider"></div>
 
-	<!-- The grid. Inline CSS so grid can change, shuddup. -->
-	<style id="ui_style"></style>
-	<style id="grid_style"></style>
-	<div id="grid_container">
-		<div id="grid_bg"></div>
-		<div id="grid"></div>
-	</div>
+                <!-- Playback -->
+                <div class="control_button" id="play_pause">pause</div>
+                <div class="control_speed">
+                    <input
+                        id="control_fps"
+                        type="range"
+                        min="1"
+                        max="60"
+                        step="1"
+                    />
+                    <br />
+                    <div class="speed_labels"></div>
+                    <div style="float:left;">slow</div>
+                    <div style="float:right;">fast</div>
+                </div>
+                <div
+                    class="control_button"
+                    id="play_step"
+                    title="Advance One Step"
+                >
+                    step
+                </div>
+                <div class="control_divider"></div>
 
-	<!-- Play/Pause/Reset/Step/Draw controls -->
-	<div id="play_container">
-		<div id="play_controls">
-			
-			<!-- New Board -->
-			<div class="control_button" id="play_reset">reset</div>
-			<div class="control_divider"></div>
-
-			<!-- Playback -->
-			<div class="control_button" id="play_pause">pause</div>
-			<div class="control_speed">
-				<input id="control_fps" type="range" min="1" max="60" step="1">
-				<br>
-				<div style="float:left;">slow</div>
-				<div style="float:right;">fast</div>
-			</div>
-			<div class="control_button" id="play_step">step</div>
-			<div class="control_divider"></div>
-
-			<!-- Drawing Shtuff -->
-			<div class="control_button" id="play_draw">draw <div></div></div>
-
-		</div>
-	</div>
-
-	<!-- The big honkin' editor -->
-	<div id="editor_container">
-		<div id="editor"></div>
-	</div>
-
-</body>
+                <!-- Drawing Shtuff -->
+                <div class="control_button" id="play_draw" title="Cycle Drawing Brush">
+                    draw
+                    <div></div>
+                </div>
+            </div>
+        </div>
+    </body>
 </html>
 
 <!-- External Libraries -->

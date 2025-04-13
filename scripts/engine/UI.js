@@ -216,6 +216,9 @@ Grid.domContainer.addEventListener("mousemove",function(event){
 	
 },false);
 window.addEventListener("mouseup",function(event){
+	if (Mouse.pressed) { // Only update URL if drawing was active
+        Save.updateURL();
+    }
 	Mouse.pressed = false;
 },false);
 
@@ -249,6 +252,9 @@ var changeTiles = function(){
 	// Update the rendering
 	if(MouseTiles.length>0){
 		publish("/grid/updateAgents");
+	}
+	window.hasUnsavedChanges = true;
+        Save.updateURL();
 	}
 
 };
@@ -325,6 +331,9 @@ window.addEventListener("mousemove",function(e){
 
 },false);
 window.addEventListener("mouseup",function(event){
+	if (scrubInput) {
+        Save.updateURL();
+    }
 	scrubInput = null;
 },false);
 

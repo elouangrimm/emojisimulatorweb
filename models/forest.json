@@ -1,1 +1,66 @@
-{"meta":{"description":"😘 Welcome to Emoji Simulator! 😘\n\nHere's some examples to spark your imagination: (copy-paste links below)\n\n🔥 Forest Fires (this one you're seeing!)\n(← CLICK on the grid to create a fire)\n\n💀 Epidemics\nhttps://ncase.me/sim/?s=sick\n\n🌸 Conway's Game of Life\nhttps://ncase.me/sim/?s=conway\n\n🔴 B-Z Chemical Spirals\nhttps://ncase.me/sim/?s=bz\n\n🐹 Schelling's Segregation Model\nhttps://ncase.me/sim/?s=schelling\n\n🦊 Predator-Prey Model\nhttps://ncase.me/sim/?s=prey\n\n🏖 Procedurally Generated Beaches\nhttps://ncase.me/sim/?s=beach\n\n😐 [Blank Sim] (to make your own)\nhttps://ncase.me/sim/?s=blank\n\nYou can edit the text in ANY of these textboxes, including this one. Change the rules & emoji below to make new sims. Finally, you can SAVE and SHARE your sim.\n\nHave fun! 🎉","draw":2,"fps":30,"play":true},"states":[{"id":0,"icon":"","name":"empty spot","actions":[{"type":"if_random","probability":0.003,"actions":[{"type":"go_to_state","stateID":1,"actions":[]}]}],"description":"Grows trees."},{"id":1,"icon":"🌲","name":"tree","actions":[{"type":"if_random","probability":0.0001,"actions":[{"type":"go_to_state","stateID":2,"actions":[]}]},{"type":"if_neighbor","sign":">=","num":1,"stateID":2,"actions":[{"type":"go_to_state","stateID":2,"actions":[]}]}],"description":"Catches on fire if hit by lightning, or if a neighbor's on fire."},{"id":2,"icon":"🔥","name":"fire","actions":[{"stateID":0,"type":"go_to_state","actions":[]}],"description":"Burns away."}],"world":{"update":"simultaneous","neighborhood":"moore","proportions":[{"stateID":0,"parts":100},{"stateID":1,"parts":0},{"stateID":2,"parts":0}],"size":{"width":40,"height":33}}}
+{
+    "meta": {
+        "title": "Forest Fire Sim",
+        "draw": 2,
+        "fps": 30,
+        "play": true
+    },
+    "states": [
+        {
+            "id": 0,
+            "icon": "",
+            "name": "empty spot",
+            "actions": [
+                {
+                    "type": "if_random",
+                    "probability": 0.003,
+                    "actions": [
+                        { "type": "go_to_state", "stateID": 1, "actions": [] }
+                    ]
+                }
+            ],
+            "description": "Grows trees."
+        },
+        {
+            "id": 1,
+            "icon": "🌲",
+            "name": "tree",
+            "actions": [
+                {
+                    "type": "if_random",
+                    "probability": 0.0001,
+                    "actions": [
+                        { "type": "go_to_state", "stateID": 2, "actions": [] }
+                    ]
+                },
+                {
+                    "type": "if_neighbor",
+                    "sign": ">=",
+                    "num": 1,
+                    "stateID": 2,
+                    "actions": [
+                        { "type": "go_to_state", "stateID": 2, "actions": [] }
+                    ]
+                }
+            ],
+            "description": "Catches on fire if hit by lightning, or if a neighbor's on fire."
+        },
+        {
+            "id": 2,
+            "icon": "🔥",
+            "name": "fire",
+            "actions": [{ "stateID": 0, "type": "go_to_state", "actions": [] }],
+            "description": "Burns away."
+        }
+    ],
+    "world": {
+        "update": "simultaneous",
+        "neighborhood": "moore",
+        "proportions": [
+            { "stateID": 0, "parts": 100 },
+            { "stateID": 1, "parts": 0 },
+            { "stateID": 2, "parts": 0 }
+        ],
+        "size": { "width": 40, "height": 33 }
+    }
+}

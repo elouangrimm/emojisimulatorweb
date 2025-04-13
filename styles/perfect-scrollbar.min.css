@@ -14,156 +14,88 @@
     pointer-events: none
 }
 
-.ps-container.ps-in-scrolling.ps-x>.ps-scrollbar-x-rail {
-    background-color: #eee;
-    opacity: 0.9
-}
-
-.ps-container.ps-in-scrolling.ps-x>.ps-scrollbar-x-rail>.ps-scrollbar-x {
-    background-color: #999
-}
-
-.ps-container.ps-in-scrolling.ps-y>.ps-scrollbar-y-rail {
-    /*background-color: #eee;
-
-    
-    NICKY - NO.
+.ps-container.ps-in-scrolling.ps-x > .ps-scrollbar-x-rail {
+    background-color: #d9d4de; /* M3 Track color */
     opacity: 0.9;
-    */
-
-}
-
-.ps-container.ps-in-scrolling.ps-y>.ps-scrollbar-y-rail>.ps-scrollbar-y {
-	
-	/*background-color: #cc7272;*/
-  	
-  	/*cursor: -webkit-grabbing;
-    cursor: -moz-grabbing;
-    cursor: grabbing;*/
-
-}
-
-.ps-container>.ps-scrollbar-x-rail {
+  }
+  .ps-container.ps-in-scrolling.ps-x > .ps-scrollbar-x-rail > .ps-scrollbar-x {
+    background-color: #79747e; /* M3 Outline Variant */
+  }
+  .ps-container.ps-in-scrolling.ps-y > .ps-scrollbar-y-rail {
+    background-color: #d9d4de; /* M3 Track color */
+    opacity: 0.9;
+  }
+  .ps-container.ps-in-scrolling.ps-y > .ps-scrollbar-y-rail > .ps-scrollbar-y {
+    background-color: #79747e; /* M3 Outline Variant */
+    cursor: grabbing;
+  }
+  
+  /* X Scrollbar Rail */
+  .ps-container > .ps-scrollbar-x-rail {
     display: none;
     position: absolute;
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
-    -ms-border-radius: 4px;
     border-radius: 4px;
     opacity: 0;
-    -webkit-transition: background-color 0.2s linear, opacity 0.2s linear;
-    -moz-transition: background-color 0.2s linear, opacity 0.2s linear;
-    -o-transition: background-color 0.2s linear, opacity 0.2s linear;
-    transition: background-color 0.2s linear, opacity 0.2s linear;
+    transition: background-color .2s linear, opacity .2s linear;
     bottom: 3px;
-    height: 8px
-}
-
-.ps-container>.ps-scrollbar-x-rail>.ps-scrollbar-x {
+    height: 8px; /* Keep slim */
+    background-color: #f3f0f4; /* Editor BG */
+  }
+  /* X Scrollbar Thumb */
+  .ps-container > .ps-scrollbar-x-rail > .ps-scrollbar-x {
     position: absolute;
-    background-color: #aaa;
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
-    -ms-border-radius: 4px;
+    background-color: #aaa; /* Keep default */
     border-radius: 4px;
-    -webkit-transition: background-color 0.2s linear;
-    -moz-transition: background-color 0.2s linear;
-    -o-transition: background-color 0.2s linear;
-    transition: background-color 0.2s linear;
+    transition: background-color .2s linear;
     bottom: 0;
-    height: 8px
-}
-
-.ps-container>.ps-scrollbar-y-rail {
+    height: 8px;
+  }
+  
+  /* Y Scrollbar Rail */
+  .ps-container > .ps-scrollbar-y-rail {
     display: none;
     position: absolute;
-    
-    /*
-    NICKY - NO.
-    opacity: 0;
-    */
-
-    background-color: #FFF;
-
-    -webkit-transition: background-color 0.2s linear, opacity 0.2s linear;
-    -moz-transition: background-color 0.2s linear, opacity 0.2s linear;
-    -o-transition: background-color 0.2s linear, opacity 0.2s linear;
-    transition: background-color 0.2s linear, opacity 0.2s linear;
-    
-    width: 20px;
-}
-
-.ps-container>.ps-scrollbar-y-rail>.ps-scrollbar-y {
+    opacity: 1; /* Make it visible by default */
+    background-color: #f3f0f4; /* Match editor background */
+    border-radius: 10px; /* Rounded rail */
+    transition: background-color .2s linear, opacity .2s linear;
+    width: 12px; /* Slimmer */
+    right: 4px; /* Closer to edge */
+  }
+  /* Y Scrollbar Thumb */
+  .ps-container > .ps-scrollbar-y-rail > .ps-scrollbar-y {
     position: absolute;
-
-    background-color: #888;
-    width: 16px;
-    border-radius: 10px;
-    
-    /*cursor: -webkit-grab;
-    cursor: -moz-grab;
-    cursor: grab;*/
-
-    -webkit-transition: background-color 0.2s linear;
-    -moz-transition: background-color 0.2s linear;
-    -o-transition: background-color 0.2s linear;
-    transition: background-color 0.2s linear;
-    right: 2px;
-}
-
-.ps-container:hover.ps-in-scrolling {
-    pointer-events: none
-}
-
-.ps-container:hover.ps-in-scrolling.ps-x>.ps-scrollbar-x-rail {
-    background-color: #eee;
-    opacity: 0.9
-}
-
-.ps-container:hover.ps-in-scrolling.ps-x>.ps-scrollbar-x-rail>.ps-scrollbar-x {
-    background-color: #999
-}
-
-.ps-container:hover.ps-in-scrolling.ps-y>.ps-scrollbar-y-rail {
-    /*background-color: #eee;
-    
-    
-    NICKY - NO.
+    background-color: #cac4d0; /* M3 Outline */
+    width: 8px; /* Slimmer thumb */
+    border-radius: 4px;
+    transition: background-color .2s linear;
+    right: 2px; /* Center thumb */
+    cursor: grab;
+  }
+  .ps-container > .ps-scrollbar-y-rail:hover > .ps-scrollbar-y {
+     background-color: #79747e; /* Darker on hover */
+  }
+  .ps-container > .ps-scrollbar-y-rail > .ps-scrollbar-y:active {
+     background-color: #6750a4; /* Primary when grabbing */
+     cursor: grabbing;
+  }
+  
+  
+  /* Hover states for rails */
+  .ps-container:hover > .ps-scrollbar-x-rail,
+  .ps-container:hover > .ps-scrollbar-y-rail {
+    opacity: 1; /* Fully visible on hover */
+  }
+  
+  .ps-container:hover > .ps-scrollbar-x-rail:hover {
+    background-color: #d9d4de; /* M3 Track hover */
     opacity: 0.9;
-    */
-
-}
-
-.ps-container:hover.ps-in-scrolling.ps-y>.ps-scrollbar-y-rail>.ps-scrollbar-y {
-    /*background-color: #999*/
-}
-
-.ps-container:hover>.ps-scrollbar-x-rail,
-.ps-container:hover>.ps-scrollbar-y-rail {
-    /*
-    NICKY - NO.
-    opacity: 0.6;
-    */
-}
-
-.ps-container:hover>.ps-scrollbar-x-rail:hover {
-    background-color: #eee;
-    opacity: 0.9
-}
-
-.ps-container:hover>.ps-scrollbar-x-rail:hover>.ps-scrollbar-x {
-    background-color: #999
-}
-
-.ps-container:hover>.ps-scrollbar-y-rail:hover {
- /*   background-color: #eee;
-
-    NICKY - NO.
-    opacity: 0.9;
-    */
-
-}
-
-.ps-container:hover>.ps-scrollbar-y-rail:hover>.ps-scrollbar-y {
-    /*background-color: #999*/
-}
+  }
+  .ps-container:hover > .ps-scrollbar-x-rail:hover > .ps-scrollbar-x {
+    background-color: #79747e; /* M3 Outline Variant hover */
+  }
+  
+  .ps-container:hover > .ps-scrollbar-y-rail:hover {
+    background-color: #e7e0ec; /* M3 Surface Container High hover */
+  }
+  

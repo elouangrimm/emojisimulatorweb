@@ -106,7 +106,7 @@ as well as serialize & deserialize.
 
 		// Paused, or not seen - also don't update
 		if(!Model.isPlaying) return;
-		if(!window.isOnScreen) return;
+		// if(!window.isOnScreen) return;
 
 		// If after all that, it should STEP...
 		for(var i=0;i<steps;i++){

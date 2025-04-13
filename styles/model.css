@@ -1,384 +1,681 @@
-body{
-	margin:0;
-	overflow: hidden;
-	display: none;
-
-	font-family: 'OpenSansEmoji', Helvetica, Arial, sans-serif;
-	font-weight: 100;
-	font-size: 16px;
+/* styles/model.css */
+/* Basic Reset & Font */
+body {
+    margin: 0;
+    overflow: hidden;
+    display: none; /* Keep this, JS will set to block */
+    font-family: 'Roboto', 'OpenSansEmoji', Helvetica, Arial, sans-serif; /* Add Roboto preference */
+    font-weight: 300; /* Lighter default weight */
+    font-size: 16px;
+    background-color: #f8f8f8; /* Lighter page background */
+    color: #1c1b1f; /* Material 3 base text color */
+    height: 100vh;
+    display: flex; /* Use flexbox for layout */
 }
 
-div{
-	-webkit-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	user-select: none;
+div, input, select, textarea, button {
+    box-sizing: border-box; /* Better box model */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
+
+/* Main Layout Containers */
+#grid_container {
+    /* width: 60%; */ /* Let flexbox handle width */
+    flex-grow: 1; /* Take remaining space */
+    height: calc(100vh - 60px); /* Full height minus play controls */
+    position: relative;
+    background-color: #000000; /* Black background for grid area */
+    display: flex; /* Center the grid */
+    justify-content: center;
+    align-items: center;
+    overflow: hidden; /* Hide overflow if grid is larger */
+}
+
+#editor_container {
+    width: 380px; /* Fixed width for editor */
+    min-width: 340px;
+    height: 100vh; /* Full height */
+    background: #f3f0f4; /* Material 3 Surface Container Low */
+    overflow-y: scroll; /* Keep scroll */
+    border-left: 1px solid #cac4d0; /* Divider */
+    position: relative; /* Needed for perfect-scrollbar */
+    flex-shrink: 0; /* Don't shrink */
+}
+
+#play_container {
+    /* width: 60%; */ /* Let flexbox handle */
+    flex-grow: 1;
+    height: 60px; /* Slightly taller controls */
+    position: fixed; /* Fixed at bottom */
+    left: 0;
+    bottom: 0;
+    background-color: #e7e0ec; /* M3 Surface Container High */
+    border-top: 1px solid #cac4d0; /* Divider */
+    color: #49454f; /* M3 On Surface Variant */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 10px; /* Padding */
+    z-index: 10; /* Above grid */
+}
+
 
 /***************
 THE GRID
 ***************/
-
-#grid_container{
-	width: 60%;
-	height: 100%;
-	float: left;
-	position: relative;
+#grid, #grid_bg {
+    position: absolute; /* Keep absolute positioning within centered container */
+    /* margin: auto; top:0; left:0; right:0; bottom:0; */ /* Handled by flexbox parent now */
+    cursor: default;
+    border: 1px solid #444; /* Darker border for grid */
+    box-sizing: content-box; /* Make border outside */
 }
 
-#grid, #grid_bg{
-	position: absolute;
-	margin: auto;
-	top:0; left:0; right:0; bottom:0;
-	cursor: default;
+#grid > div > div { /* Cell */
+    float: left;
+    line-height: 1em; /* Keep for vertical align */
+    text-align: center;
+    display: flex; /* Center emoji better */
+    justify-content: center;
+    align-items: center;
+    color: #fff; /* White emoji on black */
 }
-#grid>div>div{
-	float:left;
+
+#grid_bg > div { /* BG Cell */
+    position: absolute;
+    border: 1px solid #2a2a2a; /* Very dark grid lines */
+     /* Remove background color from here */
+    box-sizing: border-box;
 }
-#grid>div>div{
-	line-height: 1em;
-	text-align: center;
-}
-#grid_bg>div{
-	position: absolute;
-}
-#grid_bg, #grid_bg>div{
-	border: 1px solid #eee;
-}
+/* #grid_bg is now handled by #grid_container */
+
 
 /***************
 THE EDITOR
 ***************/
+#editor {
+    padding: 20px; /* Adjusted padding */
+    margin: 0; /* Remove margin */
+}
 
-#editor_container{
-	min-width: 340px;
-	width: 40%;
-	height: 100%;
+#editor .editor_title {
+    font-size: 24px; /* Slightly smaller */
+    margin-bottom: 20px;
+    color: #1d192b; /* M3 Primary */
+    font-weight: 400;
+}
+#editor .editor_title span {
+    font-weight: 500; /* Medium weight */
+}
 
-	position: absolute;
-	right: 0;
-
-	background: #ddd;
-	overflow-y: scroll;
-}
-#editor{
-	margin: 40px 40px 40px 20px;
-}
-#editor .editor_state{
-	margin-bottom: 35px;
-}
-#editor .editor_state_header{
-	height: 40px;
-	overflow: hidden;
-}
-#editor .editor_title{
-	font-size: 27px;
-	margin-bottom: 25px;
-}
-#editor .editor_title span{
-	font-weight: bold;
-}
-#editor textarea{
-
-	font-family: 'OpenSansEmoji', Helvetica, Arial, sans-serif;
-    font-weight: 100;
-    font-size: 16px;
-
+/* Title Input (Replaces Description) */
+#editor .editor_main_title_input {
+    font-family: 'Roboto', 'OpenSansEmoji', Helvetica, Arial, sans-serif;
+    font-weight: 400;
+    font-size: 24px;
+    border: none;
+    border-bottom: 2px solid #6750a4; /* M3 Primary */
     background: none;
-    margin: 0;
-	border: none;
-	
-	width: 100%;
-    resize: none;
-    overflow: hidden;
-    
+    width: 100%;
+    padding: 8px 0;
+    margin-bottom: 25px;
+    outline: none;
+    color: #1c1b1f;
 }
-#editor .editor_textarea{
-    background: #ccc;
-    padding: 10px;
+#editor .editor_main_title_input:focus {
+     border-bottom-color: #4f378b; /* Darker primary */
 }
-#editor .editor_state > textarea{
-	background: #ccc;
-	color: #666;
-	padding: 10px;
-	margin: 10px 0;
-}
-#editor input[type=text], #editor input[type=number]{
-	font-family: 'OpenSansEmoji', Helvetica, Arial, sans-serif;
-	font-weight: 100;
 
-	background: none;
-	border:1px solid #aaa;
-	border-radius: 3px;
+/* State Container */
+#editor .editor_state {
+    margin-bottom: 25px;
+    background-color: #fffbfe; /* M3 Surface */
+    border-radius: 12px; /* Rounded corners */
+    padding: 15px;
+    border: 1px solid #cac4d0; /* Outline */
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1); /* Subtle elevation */
+}
 
+#editor .editor_state_header {
+    height: auto; /* Auto height */
+    margin-bottom: 10px;
+    display: flex; /* Use flex for alignment */
+    align-items: center;
 }
-#editor input.editor_icon{
-	font-size:30px;
-	text-align: center;
-	width:40px;
-	height:40px;
-	background: none;
-	border-right: none;
-	display: block;
-	float: left;
 
-	border-radius: 5px 0 0 5px;
-}
-#editor input[type=text].editor_name{
-	font-size:20px;
-	width: 200px;
-	height:40px;
-	padding: 5px 10px;
-	display: block;
-	float: left;
-
-	border-radius: 0 5px 5px 0;
-}
-#editor input[type=text].editor_number{
-	font-size: 16px;
-    width: 40px;
-    cursor: col-resize;
-
-    border:none;
-    border-bottom: 2px dotted #aaa;
-    border-radius: 0;
-
-}
-#editor .editor_new_action{
-	position: relative;
-	left: -20px;
-	width: 50px;
-	height: 20px;
-}
-#editor .editor_new_action div{
-	width: 40px;
-	height: 20px;
-	padding: 0 5px;
-	border:1px solid #aaa;
-	border-radius: 5px;
-	position: absolute;
-
-	font-family: 'OpenSansEmoji', Helvetica, Arial, sans-serif;
-	font-weight: 100;
-	font-size: 15px;
-
-	text-align: center;
-	color: #aaa;
-}
-#editor .editor_new_action select{
-	opacity: 0;
-	position: absolute;
-	width: 50px;
-	cursor: pointer;
-}
-#editor .editor_fancy_button{
-	border-radius: 5px;
-	width: 240px;
-	height: 40px;
-	background: #aaa;
-
-	font-family: 'OpenSansEmoji', Helvetica, Arial, sans-serif;
-	font-weight: 100;
-	font-size: 20px;
-	line-height: 40px;
-	color: #ddd;
-
-	cursor: pointer;
-
-}
-#editor .editor_fancy_button:hover{
-	background: #b1b1b1;
-}
-#editor .editor_fancy_button#save_changes{
-	background: #333;
-}
-#editor .editor_fancy_button#save_changes:hover{
-	background: #555;
-}
-#editor .editor_fancy_button span{
-	font-size: 40px;
-    width: 40px;
-    display: block;
-    float: left;
-    text-align: center;
-    position: relative;
-    border-right: 1px solid #ddd;
-    line-height: 30px;
-    height: 40px;
+#editor input.editor_icon {
+    font-size: 28px; /* Adjust size */
+    width: 44px;
+    height: 44px;
+    background: #e8def8; /* M3 Primary Container */
+    border: 1px solid #cac4d0;
+    border-radius: 8px; /* Rounded */
     margin-right: 10px;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
 }
-#editor .editor_save_link{
-	width:100%;
-	font-size: 14px;
-}
-#editor select{
-	
-	max-width:120px;
 
-	font-family: 'OpenSansEmoji', Helvetica, Arial, sans-serif;
+#editor input[type=text].editor_name {
+    font-size: 18px;
+    height: 44px;
+    padding: 5px 10px;
+    border: 1px solid #cac4d0;
+    border-radius: 8px; /* Rounded */
+    flex-grow: 1; /* Take remaining space */
+    background-color: #fffbfe;
+}
+#editor input[type=text].editor_name:focus {
+     border-color: #6750a4; /* M3 Primary */
+     outline: none;
+}
 
+#editor div.delete_state {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%; /* Circular */
+    cursor: pointer;
+    margin-left: 10px;
+    font-size: 24px;
+    opacity: 0.6;
+    color: #b3261e; /* M3 Error */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-shrink: 0;
+    background: none;
+    border: none;
 }
-#editor ul{
-	margin: 0;
-	padding-left: 30px;
-	list-style-type: none;
-	position: relative;
+#editor div.delete_state:hover {
+    opacity: 1;
+    background-color: #fdeded; /* M3 Error Container (ish) */
 }
-#editor li{
-	padding-left: 0px;
-	list-style-type: none;
-	position: relative;
-	margin-bottom: 5px;
+
+/* State Description Textarea (Removed, but keeping style for other textareas) */
+#editor textarea, #editor .editor_textarea {
+    font-family: 'Roboto', 'OpenSansEmoji', Helvetica, Arial, sans-serif;
+    font-weight: 300;
+    font-size: 14px; /* Smaller text */
+    background: #f3f0f4; /* M3 Surface Container Low */
+    margin: 10px 0;
+    border: 1px solid #cac4d0;
+    border-radius: 8px; /* Rounded */
+    width: 100%;
+    resize: none;
+    overflow: hidden; /* Keep hiding scrollbar */
+    padding: 10px;
+    color: #49454f;
+    line-height: 1.4;
 }
-#editor li > div.delete_action{
-	width: 20px;
+#editor textarea:focus, #editor .editor_textarea:focus {
+    outline: none;
+    border-color: #6750a4;
+}
+
+
+/* Action Number Input */
+#editor input[type=text].editor_number {
+    font-size: 16px;
+    width: 50px; /* Slightly wider */
+    cursor: col-resize;
+    border: none;
+    border-bottom: 1px solid #79747e; /* M3 Outline Variant */
+    border-radius: 0;
+    background: none;
+    text-align: center;
+    padding: 2px 0;
+}
+#editor input[type=text].editor_number:focus {
+     border-bottom: 2px solid #6750a4;
+}
+
+/* Action UI List */
+#editor .editor_actions ul {
+    margin: 10px 0 0 0; /* Remove default margin */
+    padding-left: 25px; /* Indent */
+    list-style-type: none;
+    position: relative;
+    border-left: 1px dashed #cac4d0; /* Dashed line for hierarchy */
+}
+#editor .editor_actions li {
+    padding-left: 10px; /* Space from line */
+    position: relative;
+    margin-bottom: 8px;
+}
+
+#editor li > div.delete_action {
+    width: 20px;
     height: 20px;
     position: absolute;
-    left: -20px;
+    left: -28px; /* Position over the line */
+    top: 2px;
     cursor: pointer;
-    opacity: 0.3;
+    opacity: 0.5;
+    color: #b3261e; /* Error color */
+    font-size: 18px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
-#editor div.delete_state{
-	width: 40px;
-    height: 40px;
-    border-radius: 5px;
-    cursor: pointer;
-    float: left;
-    text-align: center;
-    font-size: 30px;
-    opacity: 0.3;
-}
-#editor li > div.delete_action:hover, #editor div.delete_state:hover{
-	opacity: 0.6;
+#editor li > div.delete_action:hover {
+    opacity: 1;
+    background-color: #fdeded;
+    border-radius: 50%;
 }
 
-#editor div.proportions{
-	overflow: hidden;
+/* Add Action Button */
+#editor .editor_new_action {
+    position: relative;
+    left: -28px; /* Align with delete */
+    width: auto; /* Auto width */
+    height: 30px;
+    display: inline-block; /* Allow inline placement */
+    margin-top: 5px;
 }
-#editor div.proportions > div{
-	overflow: hidden;
+#editor .editor_new_action div { /* The visible button part */
+    width: auto;
+    height: 30px;
+    padding: 0 12px;
+    border: 1px solid #79747e; /* Outline */
+    border-radius: 15px; /* Pill shape */
+    position: absolute;
+    font-family: 'Roboto', 'OpenSansEmoji', Helvetica, Arial, sans-serif;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 28px; /* Center text */
+    text-align: center;
+    color: #6750a4; /* Primary */
+    background-color: #fffbfe; /* Surface */
+    cursor: pointer;
+    transition: background-color 0.2s;
 }
-#editor div.proportions > div > span{
-	width:1em;
-	height: 1em;
-	display: inline-block;
-	border-right: 1px solid #aaa;
-	padding-right: 5px;
-	margin-right: 5px;
+#editor .editor_new_action div:hover {
+    background-color: #e8def8; /* Primary container (hover) */
 }
-#editor div.proportions > div > input[type=range]{
-	width: 230px;
+
+#editor .editor_new_action select {
+    opacity: 0;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%; /* Cover the visible button */
+    height: 100%;
+    cursor: pointer;
 }
-#editor hr{
-	margin: 40px 0;
+
+/* Generic Fancy Button */
+#editor .editor_fancy_button {
+    border-radius: 18px; /* More rounded */
+    min-width: 180px; /* Min width */
+    width: auto; /* Auto width */
+    padding: 0 20px; /* Padding left/right */
+    height: 40px;
+    background: #6750a4; /* M3 Primary */
+    font-weight: 500; /* Medium */
+    font-size: 14px; /* Standard button text */
+    line-height: 40px;
+    color: #ffffff; /* On Primary */
+    cursor: pointer;
+    display: inline-flex; /* Use flex for icon+text */
+    align-items: center;
+    justify-content: center;
+    text-align: center;
     border: none;
-    height: 4px;
-    border-bottom: 1px solid #aaa;
-    border-top: 1px solid #aaa;
+    transition: background-color 0.2s, box-shadow 0.2s;
+    margin-bottom: 15px; /* Spacing */
+    box-shadow: 0 1px 2px rgba(0,0,0,0.3);
 }
+#editor .editor_fancy_button:hover {
+    background: #5a4591; /* Darker Primary */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+/* Icon within button */
+#editor .editor_fancy_button span.button-icon {
+    font-size: 20px; /* Icon size */
+    width: auto;
+    margin-right: 8px; /* Space between icon and text */
+    /* Remove old styles */
+    border-right: none;
+    line-height: inherit;
+    height: auto;
+    float: none;
+    display: inline;
+    text-align: center;
+    position: relative;
+}
+
+/* Specific Buttons */
+#editor .editor_fancy_button#save_local_button { /* Renamed */
+    background: #006d3f; /* M3 Tertiary (example) */
+}
+#editor .editor_fancy_button#save_local_button:hover {
+    background: #005a33;
+}
+#editor .editor_fancy_button#export_model_button { /* Renamed */
+     background: #7d5260; /* M3 Secondary (example) */
+}
+#editor .editor_fancy_button#export_model_button:hover {
+     background: #643f4c;
+}
+#editor .editor_fancy_button#import_model_button { /* Added */
+     background: #7d5260; /* M3 Secondary (example) */
+}
+#editor .editor_fancy_button#import_model_button:hover {
+     background: #643f4c;
+}
+
+
+/* Save/Load Section */
+#editor .editor_save_load_section {
+    margin-top: 25px;
+    padding: 15px;
+    background-color: #e7e0ec; /* Surface Container High */
+    border-radius: 12px;
+    border: 1px solid #cac4d0;
+}
+#editor .editor_save_load_section h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 16px;
+    font-weight: 500;
+    color: #1d192b;
+}
+
+/* Input Fields (URL, Save Name) */
+#editor input.editor_text_input { /* General text input */
+    width: 100%;
+    font-size: 14px;
+    padding: 10px;
+    border: 1px solid #79747e; /* Outline */
+    border-radius: 4px; /* M3 standard */
+    margin-bottom: 10px;
+    background-color: #fffbfe; /* Surface */
+}
+#editor input.editor_text_input[readonly] {
+    background-color: #f3f0f4; /* Surface Container Low */
+    cursor: default;
+}
+#editor input.editor_text_input:focus {
+    outline: none;
+    border-color: #6750a4; /* Primary */
+}
+
+/* Dropdown (Select) */
+#editor select {
+    max-width: none; /* Allow full width */
+    width: 100%; /* Full width */
+    padding: 10px;
+    font-family: 'Roboto', 'OpenSansEmoji', Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    border: 1px solid #79747e;
+    border-radius: 4px;
+    background-color: #fffbfe;
+    margin-bottom: 10px;
+     -webkit-appearance: none; /* Remove default styling */
+     -moz-appearance: none;
+     appearance: none;
+     background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007CB2%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.6-3.6%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
+     background-repeat: no-repeat;
+     background-position: right 10px top 50%;
+     background-size: 10px auto;
+     padding-right: 30px; /* Space for arrow */
+}
+#editor select:focus {
+    outline: none;
+    border-color: #6750a4;
+}
+
+
+/* Proportions Sliders */
+#editor div.proportions {
+    overflow: hidden;
+    margin-top: 15px;
+}
+#editor div.proportions > div {
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+#editor div.proportions > div > span { /* Icon */
+    width: 1.5em; /* Slightly larger */
+    height: 1.5em;
+    display: inline-flex; /* Use flex */
+    justify-content: center;
+    align-items: center;
+    margin-right: 10px;
+    font-size: 18px; /* Icon size */
+    flex-shrink: 0;
+}
+#editor div.proportions > div > input[type=range] {
+    /* width: 230px; */ /* Let flex handle */
+    flex-grow: 1;
+    cursor: pointer;
+    height: 8px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: #d9d4de; /* M3 Track */
+    border-radius: 4px;
+    outline: none;
+}
+/* Chrome/Safari Thumb */
+#editor div.proportions > div > input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    background: #6750a4; /* M3 Thumb */
+    border-radius: 50%;
+    cursor: pointer;
+}
+/* Firefox Thumb */
+#editor div.proportions > div > input[type=range]::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    background: #6750a4;
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+}
+
+
+/* Divider Line */
+#editor hr {
+    margin: 30px 0; /* Adjust spacing */
+    border: none;
+    height: 1px;
+    background-color: #cac4d0; /* M3 Outline */
+}
+
+/* Helper text/labels */
+#editor .editor_label {
+    font-size: 12px;
+    color: #49454f; /* On Surface Variant */
+    display: block;
+    margin-bottom: 5px;
+    line-height: 1.3;
+}
+#editor .editor_label a {
+    color: #6750a4; /* Primary */
+    text-decoration: none;
+}
+#editor .editor_label a:hover {
+    text-decoration: underline;
+}
+
+/* Credits */
+#editor .credits_label {
+     font-size: 14px; /* Adjust size */
+     color: #49454f;
+     margin: 30px 0;
+     line-height: 1.5;
+}
+
 
 /***************
 THE PLAY CONTROLS
 ***************/
-
-#play_container{
-	padding: 10px 0;
-    width: 60%;
+#play_controls {
+    width: auto; /* Auto width */
+    max-width: 500px; /* Max width */
     height: 40px;
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    color: #888;
+    /* margin: 0 auto; */ /* Centered by parent */
+    overflow: hidden;
+    display: flex; /* Use flex */
+    align-items: center;
+    gap: 8px; /* Spacing between controls */
 }
-#play_controls{
-	width: 445px;
-	height: 40px;
-	margin: 0 auto;
-	overflow: hidden;
-}
-#play_controls > div{
-	float: left;
-}
-#play_controls > div.control_button{
-	background: #fff;
 
-	margin:0 5px;
-	padding: 5px;
+#play_controls > div {
+    /* float: left; */ /* Remove float */
+    flex-shrink: 0; /* Prevent shrinking */
+}
 
-	line-height: 30px;
-	text-align: center;
-	font-weight: normal;
-
-	-webkit-transition: background 0.2s;
-    -moz-transition: background 0.2s;
-    -ms-transition: background 0.2s;
-    -o-transition: background 0.2s;
-    transition: background 0.2s;
-
-	cursor: pointer;
-}
-#play_controls > div.control_button:hover{
-	background: #eee;
-}
-#play_controls > div.control_speed{
-	width:100px;
-	height:35px;
-	margin: 5px;
-	margin-bottom: 0;
-}
-#play_controls > div.control_speed > input{
-	width:100%; margin:0;
-}
-#play_controls > div.control_speed > div{
-	/*width: 13px;
-	height: 16px;
-    line-height: 16px;*/
-    font-size: 14px;
-}
-#play_controls > div.control_divider{
-	border-left: 1px solid #ccc;
-	border-right: 1px solid #ccc;
-	width:3px;
-	height: 100%;
-	margin: 0 5px;
-}
-#play_controls > #play_reset{
-	width:50px;
-}
-#play_controls > #play_pause{
-	width:50px;
-}
-#play_controls > #play_pause[paused=true]{
-	background: #333;
-	color: #fff;
-}
-#play_controls > #play_pause[paused=true]:hover{
-	background: #444;
-}
-#play_controls > #play_step{
-	width:40px;
-}
-#play_controls > #play_draw{
-	width:80px;
-}
-#play_controls > #play_draw > div{
-	float: right;
-    width: 30px;
-    height: 30px;
-    border: 1px solid #ccc;
-    font-size: 25px;
-    border-radius: 5px;
-    line-height: 30px;
+/* Control Buttons (Reset, Pause, Step, Draw) */
+#play_controls > .control_button {
+    background: #e8def8; /* Primary Container */
+    color: #1d192b; /* On Primary Container */
+    border: 1px solid #cac4d0;
+    border-radius: 20px; /* Pill shape */
+    padding: 0 15px; /* Horizontal padding */
+    height: 40px; /* Match container height */
+    line-height: 38px; /* Adjust for border */
     text-align: center;
-    margin-left: 5px;
+    font-weight: 500; /* Medium */
+    font-size: 14px;
+    transition: background-color 0.2s;
+    cursor: pointer;
+    display: flex; /* Align icon inside */
+    align-items: center;
+    justify-content: center;
 }
-#play_controls[basic]{
-	width: 275px;
+#play_controls > .control_button:hover {
+    background: #d8cde0; /* Darker hover */
 }
-#play_controls[basic] > div.control_speed{
-	display: none;
-}
-#play_controls[basic] > #play_step{
-	display: none;
+#play_controls > .control_button:active {
+    background: #ccc1d6; /* Even darker active */
 }
 
+
+/* Speed Control */
+#play_controls > .control_speed {
+    width: 120px; /* Wider */
+    height: auto; /* Auto height */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 5px;
+}
+#play_controls > .control_speed > input[type=range] {
+    width: 100%;
+    margin: 0;
+    cursor: pointer;
+    height: 8px;
+     -webkit-appearance: none;
+     appearance: none;
+     background: #d9d4de;
+     border-radius: 4px;
+     outline: none;
+}
+#play_controls > .control_speed > input[type=range]::-webkit-slider-thumb {
+     -webkit-appearance: none;
+     appearance: none;
+     width: 16px;
+     height: 16px;
+     background: #6750a4;
+     border-radius: 50%;
+     cursor: pointer;
+}
+#play_controls > .control_speed > input[type=range]::-moz-range-thumb {
+     width: 16px;
+     height: 16px;
+     background: #6750a4;
+     border-radius: 50%;
+     cursor: pointer;
+     border: none;
+}
+
+#play_controls > .control_speed > .speed_labels {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    font-size: 11px; /* Smaller labels */
+    color: #49454f;
+    margin-top: 2px;
+}
+
+/* Divider */
+#play_controls > .control_divider {
+    border-left: 1px solid #cac4d0;
+    width: 1px;
+    height: 24px; /* Shorter */
+    margin: 0 5px;
+}
+
+/* Specific Button Widths (Removed - use padding) */
+/* #play_controls > #play_reset { width: 50px; } */
+/* #play_controls > #play_pause { width: 50px; } */
+/* #play_controls > #play_step { width: 40px; } */
+/* #play_controls > #play_draw { width: 80px; } */
+
+
+/* Paused state */
+#play_controls > #play_pause[paused=true] {
+    background: #6750a4; /* Primary */
+    color: #ffffff; /* On Primary */
+    border-color: #6750a4;
+}
+#play_controls > #play_pause[paused=true]:hover {
+    background: #5a4591; /* Darker */
+}
+
+/* Draw Button Icon */
+#play_controls > #play_draw > div {
+    /* float: right; */ /* Remove float */
+    width: 24px; /* Smaller icon */
+    height: 24px;
+    border: 1px solid #79747e; /* Outline variant */
+    font-size: 18px; /* Smaller emoji */
+    border-radius: 4px; /* Less rounded */
+    line-height: 22px; /* Adjust for border */
+    text-align: center;
+    margin-left: 8px; /* Space from text */
+    background: #fffbfe; /* Surface */
+    display: inline-flex; /* Keep using flex */
+    justify-content: center;
+    align-items: center;
+}
+
+/* Basic Play Controls (Hide Speed/Step) */
+#play_controls[basic] {
+    /* width: 275px; */ /* Remove fixed width */
+}
+#play_controls[basic] > .control_speed {
+    display: none;
+}
+#play_controls[basic] > #play_step {
+    display: none;
+}
+#play_controls[basic] > .control_divider:nth-of-type(2) { /* Hide second divider */
+     display: none;
+}
+
+
+/* Link Styles */
+a {
+  color: #6750a4; /* Primary color for links */
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+/* Hide the ugly file input */
+#importFile {
+    display: none;
+}
