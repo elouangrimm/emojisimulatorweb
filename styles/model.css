@@ -384,7 +384,7 @@ THE EDITOR
 #editor .editor_actions li {
 	padding: 2px 0 2px 10px;
 	/* Reduced padding, keep left padding for indent */
-	margin-bottom: 4px;
+	margin-bottom: 3px;
 	/* Reduced spacing */
 	display: block;
 	/* LI itself is block */
@@ -392,26 +392,19 @@ THE EDITOR
 	/* Adjust line height */
 	position: relative;
 	/* Needed for delete button */
+	min-height: 22px;
 }
 
-/* Force inline-block for direct children that are controls/text */
 #editor .editor_actions li>span,
-/* Labels created by EditorHelper */
 #editor .editor_actions li>select,
-/* Select dropdowns */
 #editor .editor_actions li>input[type=text].editor_number,
-/* Number inputs */
-/* Add other specific controls if needed */
-#editor .editor_actions li>.editor_state_selector_container
-
-/* Example if you wrapped state selector */
-	{
+#editor .editor_actions li>.editor_state_selector_container {
 	display: inline-block;
 	/* Use inline-block for better spacing control */
 	vertical-align: middle;
 	/* Align vertically */
 	margin-left: 0;
-	margin-right: 5px;
+	margin-right: 4px;
 	/* Space between inline elements */
 	margin-bottom: 2px;
 	/* Allow slight wrap spacing */
@@ -419,6 +412,27 @@ THE EDITOR
 	/* Reset padding */
 	font-size: inherit;
 }
+
+#editor .editor_actions li>.action-ui-container>div {
+	margin: 0;
+}
+
+#editor .editor_actions li .editor_actions {
+	margin-top: 3px;
+	margin-bottom: 3px;
+	margin-left: 10px;
+	/* Slightly less indent */
+	display: block;
+	/* Ensure nested container is block */
+}
+
+#editor .editor_actions li .editor_actions ul {
+	margin-left: 15px;
+	/* Indent items within nested list */
+	margin-top: 3px;
+	margin-bottom: 3px;
+}
+
 
 #editor .editor_actions li>div:not(.delete_action):not(.editor_new_action_container) {
 	display: inline;
@@ -459,37 +473,26 @@ THE EDITOR
 }
 
 #editor li>div.delete_action {
-	width: 18px;
-	/* Smaller */
-	height: 18px;
+	width: 16px;
+	height: 16px;
 	position: absolute;
-	left: -22px;
-	/* Position left of the line */
-	top: 3px;
-	/* Adjust vertical position */
+	left: -20px;
+	/* Align left of LI content */
+	top: 50%;
+	/* Center vertically */
+	transform: translateY(-50%);
+	/* Fine-tune centering */
 	cursor: pointer;
 	opacity: 0.3;
-	/* Original opacity */
 	color: #000;
-	/* Black */
-	font-size: 16px;
-	/* Original size */
-	line-height: 18px;
-	/* Match height */
+	font-size: 14px;
+	line-height: 16px;
 	text-align: center;
-	border-radius: 0;
-	/* Square */
-	background: none;
-	/* No background */
-	transform: none;
-	/* Reset transform */
-	transition: opacity 0.2s;
 }
 
 #editor li>div.delete_action:hover {
 	opacity: 0.6;
 	/* Original hover */
-	background-color: transparent;
 }
 
 #editor .editor_new_action_container {
@@ -505,7 +508,7 @@ THE EDITOR
 	/* Reset M3 styles */
 	opacity: 1;
 	position: static;
-	width: auto;
+	width: 30px;
 	height: auto;
 	padding: 2px 5px;
 	/* Minimal padding */
@@ -800,44 +803,57 @@ THE EDITOR
 
 /* Proportions Sliders */
 #editor div.proportions {
-	overflow: hidden;
-	margin-top: 15px;
+	overflow: visible !important;
+	/* Override any hidden overflow */
+	margin-top: 10px;
+	border: 1px dashed orange;
+	/* TEMPORARY: Make it visible */
+	padding: 5px;
+	/* Add padding for visibility */
+	min-height: 20px;
+	/* Ensure it has some height */
+	display: block !important;
+	/* Ensure it's block */
+	visibility: visible !important;
+	opacity: 1 !important;
 }
 
 #editor div.proportions>div {
-	overflow: hidden;
+	overflow: visible;
 	display: flex;
 	align-items: center;
 	margin-bottom: 5px;
+	visibility: visible !important;
+	opacity: 1 !important;
 }
 
 #editor div.proportions>div>span {
-	/* Icon */
 	width: 1.5em;
-	/* Slightly larger */
 	height: 1.5em;
 	display: inline-flex;
-	/* Use flex */
 	justify-content: center;
 	align-items: center;
 	margin-right: 10px;
-	font-size: 18px;
-	/* Icon size */
+	font-size: 16px;
+	/* Adjusted size */
 	flex-shrink: 0;
+	visibility: visible !important;
+	opacity: 1 !important;
 }
 
 #editor div.proportions>div>input[type=range] {
-	/* width: 230px; */
-	/* Let flex handle */
 	flex-grow: 1;
 	cursor: pointer;
 	height: 8px;
 	-webkit-appearance: none;
 	appearance: none;
 	background: #d9d4de;
-	/* M3 Track */
 	border-radius: 4px;
 	outline: none;
+	display: block;
+	/* Make sure it displays */
+	visibility: visible !important;
+	opacity: 1 !important;
 }
 
 /* Chrome/Safari Thumb */
@@ -1052,7 +1068,8 @@ THE PLAY CONTROLS
 	/* Explicitly visible */
 	opacity: 1;
 	/* Explicitly opaque */
-	width: 16px; height: 16px;
+	width: 16px;
+	height: 16px;
 }
 
 #play_controls>.control_speed>input[type=range]::-moz-range-thumb {
@@ -1061,7 +1078,8 @@ THE PLAY CONTROLS
 	/* Explicitly visible */
 	opacity: 1;
 	/* Explicitly opaque */
-	width: 16px; height: 16px;
+	width: 16px;
+	height: 16px;
 }
 
 #play_controls>.control_speed>.speed_labels {
