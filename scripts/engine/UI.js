@@ -191,17 +191,20 @@
 
     // Inside _updateBrushIcon
     const _updateBrushIcon = function () {
-        // Use the container found above
-        if (!play_draw_icon_container || !Model.data || !Model.data.meta)
-            return;
-
+        // Define before use
+        if (!play_draw_icon_container || !Model.data?.meta) return;
+        if (!play_draw_icon || !Model.data || !Model.data.meta) return;
         const state = Model.getStateByID(Model.data.meta.draw);
         if (state) {
-            play_draw_icon_container.innerHTML = state.icon || "?"; // Set emoji in container
-            play_draw.title = `Drawing: ${state.name} (${state.icon || "?"})`;
+            play_draw_icon.innerHTML = state.icon || "?"; // Fallback icon
+            if (play_draw)
+                play_draw.title = `Drawing: ${state.name} (${
+                    state.icon || "?"
+                })`; // Update title
         } else {
-            play_draw_icon_container.innerHTML = " "; // Blank if state not found
+            play_draw_icon.innerHTML = " "; // Blank if state not found
             play_draw.title = "Select Draw Brush";
+            // Attempt to reset draw ID if invalid
             if (Model.data.meta.draw !== 0) {
                 console.warn(
                     `Draw state ID ${Model.data.meta.draw} not found, resetting to 0.`
@@ -309,33 +312,6 @@
     const play_draw_icon_container = document.getElementById(
         "play_draw_icon_container"
     );
-
-    const _updateBrushIcon = function () {
-        // Define before use
-        if (!play_draw_icon_container || !Model.data?.meta) return;
-        if (!play_draw_icon || !Model.data || !Model.data.meta) return;
-        const state = Model.getStateByID(Model.data.meta.draw);
-        if (state) {
-            play_draw_icon.innerHTML = state.icon || "?"; // Fallback icon
-            if (play_draw)
-                play_draw.title = `Drawing: ${state.name} (${
-                    state.icon || "?"
-                })`; // Update title
-        } else {
-            play_draw_icon.innerHTML = " "; // Blank if state not found
-            play_draw.title = "Select Draw Brush";
-            // Attempt to reset draw ID if invalid
-            if (Model.data.meta.draw !== 0) {
-                console.warn(
-                    `Draw state ID ${Model.data.meta.draw} not found, resetting to 0.`
-                );
-                Model.data.meta.draw = 0;
-                window.hasUnsavedChanges = true;
-                Save.updateURL();
-                _updateBrushIcon(); // Retry update
-            }
-        }
-    };
 
     if (play_draw) {
         play_draw.onclick = function () {
