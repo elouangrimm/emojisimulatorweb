@@ -1,7 +1,7 @@
-(function(){
-
-IfDoesNotSupportEmoji(function(){
-
+(function () {
+    IfDoesNotSupportEmoji(function () {
+        return;
+        /*
 	// Add this new style
 	var style = document.createElement("style");
 	style.innerHTML = ''+
@@ -10,7 +10,6 @@ IfDoesNotSupportEmoji(function(){
 		'src: url("../styles/fonts/OpenSansEmoji.otf") format("opentype");'+
 	'}';
 	document.body.appendChild(style);
-
-});
-
+	*/
+    });
 })();

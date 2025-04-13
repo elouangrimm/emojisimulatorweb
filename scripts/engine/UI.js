@@ -158,10 +158,9 @@
         play_reset.onclick = function () {
             if (
                 window.hasUnsavedChanges &&
-                !confirm("Resetting will discard unsaved changes. Continue?")
-            ) {
+                !confirm("Discard Unsaved Changes?")
+            )
                 return; // Don't reset if user cancels
-            }
             Model.returnToBackup(); // Use backup which doesn't have unsaved changes flag set initially
             // No need to reinitialize Grid here, Model.returnToBackup handles it
             publish("/notify/info", ["Simulation reset to original state."]);
@@ -189,20 +188,24 @@
         }
     };
 
+    const play_draw = document.getElementById("play_draw");
+    const play_draw_icon_container = document.getElementById(
+        "play_draw_icon_container"
+    );
+
     // Inside _updateBrushIcon
     const _updateBrushIcon = function () {
-        // Define before use
         if (!play_draw_icon_container || !Model.data?.meta) return;
-        if (!play_draw_icon || !Model.data || !Model.data.meta) return;
+
         const state = Model.getStateByID(Model.data.meta.draw);
         if (state) {
-            play_draw_icon.innerHTML = state.icon || "?"; // Fallback icon
+            play_draw_icon_container.innerHTML = state.icon || "?"; // Fallback icon
             if (play_draw)
                 play_draw.title = `Drawing: ${state.name} (${
                     state.icon || "?"
                 })`; // Update title
         } else {
-            play_draw_icon.innerHTML = " "; // Blank if state not found
+            play_draw_icon_container.innerHTML = " "; // Blank if state not found
             play_draw.title = "Select Draw Brush";
             // Attempt to reset draw ID if invalid
             if (Model.data.meta.draw !== 0) {
@@ -212,7 +215,6 @@
                 Model.data.meta.draw = 0;
                 window.hasUnsavedChanges = true;
                 Save.updateURL();
-                _updateBrushIcon(); // Retry update
             }
         }
     };
@@ -254,8 +256,11 @@
 
     if (play_pause) {
         play_pause.onclick = function () {
-            Model.isPlaying = !Model.isPlaying;
-            updatePauseUI();
+            if (window.Model) {
+                // Check Model exists
+                if (Model.isPlaying) Model.pause();
+                else Model.play();
+            }
         };
     }
     // Listen for external changes to play state
@@ -266,7 +271,7 @@
     const play_step = document.getElementById("play_step");
     if (play_step) {
         play_step.onclick = function () {
-            Model.pause(); // Ensure paused
+            if (window.Model) Model.pause(); // Ensure paused
             updatePauseUI(); // Update UI
             Grid.step();
             publish("/grid/updateAgents");
@@ -296,7 +301,7 @@
     // UPDATE THE PLAYBACK UI on load/reset
     const updatePlaybackUI = () => {
         updatePauseUI();
-        if (playback_speed && Model.data && Model.data.meta) {
+        if (playback_speed && Model.data?.meta) {
             playback_speed.value = Model.data.meta.fps || 30;
         }
     };
@@ -306,12 +311,6 @@
     /////////////////////////
     ///// CHANGE STATES ///// (Drawing)
     /////////////////////////
-
-    const play_draw = document.getElementById("play_draw");
-    const play_draw_icon = document.querySelector("#play_draw > div");
-    const play_draw_icon_container = document.getElementById(
-        "play_draw_icon_container"
-    );
 
     if (play_draw) {
         play_draw.onclick = function () {
