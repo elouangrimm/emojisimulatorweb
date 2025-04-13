@@ -432,8 +432,7 @@
             "/save/localStorage/success",
             Editor.populateSavedSimsDropdown
         );
-    }; // END OF Editor.create
-
+		
     // Helper to create title headers
     Editor.createTitle = function (html) {
         const dom = document.createElement("div");
