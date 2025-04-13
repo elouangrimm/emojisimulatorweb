@@ -11,85 +11,152 @@
     Editor.savedSimsDropdown = null; // Reference to the dropdown
     Editor.shareUrlInput = null; // Reference to the share URL input
 
+    Editor.rebuild = function () {
+        console.log("Editor.js: Rebuilding editor UI...");
+        if (!Editor.dom) return;
+
+        // Clear existing editor content safely
+        while (Editor.dom.firstChild) {
+            Editor.dom.removeChild(Editor.dom.firstChild);
+        }
+        // Recreate the editor from scratch using current Model.data
+        Editor.create(); // Assumes Editor.create correctly reads Model.data
+        // Ensure title UI is updated after recreation
+        if (Editor.updateTitleUI) Editor.updateTitleUI();
+
+        // Update scrollbar after UI is rebuilt
+        if (window.Ps && document.getElementById("editor_container")) {
+            try {
+                Ps.update(document.getElementById("editor_container"));
+            } catch (err) {}
+        }
+        console.log("Editor.js: Editor UI rebuilt.");
+    };
+
+    // Subscribe to the model load event
+    subscribe("/model/load/success", Editor.rebuild);
+
+    // Also subscribe to reset event to rebuild editor
+    subscribe("/meta/reset/complete", Editor.rebuild);
+
     // Create from model
     Editor.create = function () {
-        // Clear previous editor content if any (important for reloading)
-        Editor.dom.innerHTML = "";
+        console.log("Editor.js: Editor.create called.");
+         // Note: Editor.dom should already be cleared by Editor.rebuild before this runs again
 
-        ///////////////////////
-        ///// TITLE INPUT ///// (Replaces Description - Request 5)
-        ///////////////////////
+         // Check if editor should be shown based on UI options *after* UI.js has loaded
+         // This check might be better placed in Editor.rebuild or outside
+          if (window.UI && UI.options.edit === UI.NONE) {
+             console.log("Editor.create: Editor UI is disabled.");
+              return; // Don't build if disabled
+          }
+
+
+        // --- Title Input ---
         Editor.titleInput = document.createElement("input");
-        Editor.titleInput.type = "text";
-        Editor.titleInput.className = "editor_main_title_input";
-        Editor.titleInput.value =
-            Model.data.meta.title || "Untitled Emoji Simulation";
-        Editor.titleInput.placeholder = "Simulation Title";
-        Editor.titleInput.oninput = function () {
-            const newTitle =
-                Editor.titleInput.value || "Untitled Emoji Simulation";
-            Model.data.meta.title = newTitle;
-            document.title = newTitle + " - Emoji Simulator! 😘"; // Update tab title
-            window.hasUnsavedChanges = true; // Mark changes
-            // Debounced URL update might be good here too, or on blur/save
-            Save.updateURL();
-        };
-        Editor.titleInput.onchange = Save.updateURL; // Update URL when focus is lost too
+        // ... (title input setup - reads from Model.data) ...
         Editor.dom.appendChild(Editor.titleInput);
-        // Keep reference for updates
-        Editor.updateTitleUI = () => {
-            // Helper to update UI from model
-            if (Editor.titleInput)
-                Editor.titleInput.value =
-                    Model.data.meta.title || "Untitled Emoji Simulation";
-            document.title =
-                (Model.data.meta.title || "Untitled Emoji Simulation") +
-                " - Emoji Simulator! 😘";
-        };
+         Editor.updateTitleUI = () => { /* ... keep existing implementation ... */ };
+         // Call it once during creation to set initial value
+         Editor.updateTitleUI();
+
 
         // Divider
         Editor.dom.appendChild(Editor.createDivider());
 
-        //////////////////////
-        ///// STATES DOM /////
-        //////////////////////
-
-        Editor.dom.appendChild(
-            Editor.createTitle("<span>THINGS</span> WITH RULES")
-        );
-
+        // --- STATES DOM ---
+        Editor.dom.appendChild(Editor.createTitle("<span>THINGS</span> WITH RULES"));
         Editor.statesDOM = document.createElement("div");
         Editor.dom.appendChild(Editor.statesDOM);
-        Editor.createStatesUI(Editor.statesDOM, Model.data.states);
+         // Ensure Model.data exists before creating states UI
+         if (Model.data && Model.data.states) {
+             Editor.createStatesUI(Editor.statesDOM, Model.data.states);
+         } else {
+              console.warn("Editor.create: Model.data.states not ready for createStatesUI.");
+         }
 
-        // Button - Add a state!
-        const addStateButton = Editor.createFancyButton(
-            "<span class='button-icon'>+</span> New Thing",
-            function () {
-                // New state config
-                const emoji = Model.generateNewEmoji();
-                const newStateConfig = {
-                    id: Model.generateNewID(),
-                    icon: emoji.icon,
-                    name: "[new thing]",
-                    // description: "", // Description removed
-                    actions: [],
-                };
 
-                // Add to Model.data
-                Model.data.states.push(newStateConfig);
+        // --- Add State Button ---
+        const addStateButton = Editor.createFancyButton(/* ... */);
+        Editor.dom.appendChild(addStateButton);
 
-                // Create new DOM & append to states container
-                const stateDOM = Editor.createStateUI(newStateConfig);
-                Editor.statesDOM.appendChild(stateDOM);
+        // Divider
+        Editor.dom.appendChild(Editor.createDivider());
 
-                // Notify & mark changes
-                publish("/ui/addState", [newStateConfig.id]);
-                publish("/ui/updateStateHeaders");
-                window.hasUnsavedChanges = true;
-                Save.updateURL(); // Update URL on structural change
-            }
-        );
+        // --- WORLD DOM ---
+        Editor.dom.appendChild(Editor.createTitle("THE <span>WORLD</span>"));
+        Editor.worldDOM = document.createElement("div");
+        // Ensure Grid.createUI exists and Model.data.world is ready
+         if (window.Grid && Grid.createUI && Model.data && Model.data.world) {
+            const worldUI = Grid.createUI();
+             if (worldUI) Editor.worldDOM.appendChild(worldUI);
+         } else {
+              console.warn("Editor.create: Grid.createUI or Model.data.world not ready.");
+              Editor.worldDOM.appendChild(document.createTextNode("[World settings loading...]"));
+         }
+        Editor.dom.appendChild(Editor.worldDOM);
+
+
+        // Divider
+        Editor.dom.appendChild(Editor.createDivider());
+
+        // --- SAVE / LOAD / IO ---
+         Editor.dom.appendChild(Editor.createTitle("<span>SAVE</span> & <span>LOAD</span>"));
+         const saveLoadSection = document.createElement("div");
+         saveLoadSection.className = "editor_save_load_section";
+         // Populate save/load section... (ensure functions like createFancyButton exist)
+         try {
+             saveLoadSection.appendChild(Editor.createSubTitle("Local Saves"));
+             const localSaveRow = document.createElement("div");
+             // ... (dropdown and delete button) ...
+             Editor.savedSimsDropdown = document.createElement("select");
+             localSaveRow.appendChild(Editor.savedSimsDropdown);
+             Editor.populateSavedSimsDropdown(); // Populate
+             const deleteButton = Editor.createFancyButton(/* ... */);
+             localSaveRow.appendChild(deleteButton);
+             saveLoadSection.appendChild(localSaveRow);
+             const saveButton = Editor.createFancyButton("<span class='button-icon'>💾</span> Save Current", Save.saveModel);
+             saveLoadSection.appendChild(saveButton);
+
+             saveLoadSection.appendChild(Editor.createSubTitle("Share Link"));
+             Editor.shareUrlInput = Editor.createTextInput(true); // Readonly
+             saveLoadSection.appendChild(Editor.shareUrlInput);
+
+              saveLoadSection.appendChild(Editor.createSubTitle("Import / Export"));
+              const importExportRow = document.createElement("div");
+              importExportRow.className = "importExportRow"; // Add class for styling
+              const fileInput = document.createElement("input"); fileInput.id="importFile"; fileInput.type="file"; /* ... */
+              saveLoadSection.appendChild(fileInput); // Append hidden input
+              const importButton = Editor.createFancyButton(/* ... */);
+              importExportRow.appendChild(importButton);
+              const exportButton = Editor.createFancyButton(/* ... */);
+              importExportRow.appendChild(exportButton);
+              saveLoadSection.appendChild(importExportRow);
+
+         } catch(e) {
+              console.error("Error creating save/load UI:", e);
+              saveLoadSection.innerHTML = "[Error loading save/load controls]";
+         }
+         Editor.dom.appendChild(saveLoadSection);
+
+
+        // Divider
+        Editor.dom.appendChild(Editor.createDivider());
+
+        // --- CREDITS ---
+        if (window.UI && UI.options.edit === UI.ADVANCED) { // Check UI exists now
+             const creditsLabel = Editor.createLabel(/* ... credits html ... */);
+             creditsLabel.className = "credits_label";
+             Editor.dom.appendChild(creditsLabel);
+        }
+
+        // --- Subscribe to save events ---
+        subscribe("/save/shareURL/generated", function(url){
+             if (Editor.shareUrlInput) Editor.shareUrlInput.value = url || "";
+        });
+        subscribe("/save/localStorage/success", Editor.populateSavedSimsDropdown);
+
+    };
         Editor.dom.appendChild(addStateButton);
 
         // Divider

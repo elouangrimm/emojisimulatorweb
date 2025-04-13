@@ -130,76 +130,53 @@ as well as serialize & deserialize.
 
     // Load NEW model data (from localStorage, Import, LZString)
     // This REPLACES the current Model.data and rebuilds UI/Grid.
-    Model.loadModelData = function (newData) {
-        console.log("Model.js: Model.loadModelData called.");
+    console.log("Model.js: Model.loadModelData called.");
         try {
-            // Basic validation
+            // --- Basic validation and data preparation ---
             if (!newData || !newData.meta || !newData.states || !newData.world) {
                 throw new Error("Invalid simulation data structure.");
             }
-
-            // Ensure actions arrays exist recursively
-            const ensureActions = (items) => {
-                if (!items || !Array.isArray(items)) return;
-                items.forEach(item => {
-                    if (item && typeof item === 'object') {
-                        item.actions = item.actions || [];
-                        ensureActions(item.actions);
-                    }
-                });
-            };
+            const ensureActions = (items) => { /* ... keep ensureActions ... */ };
             ensureActions(newData.states);
-
-            // Add title if missing, remove description
             newData.meta.title = newData.meta.title || "Untitled Emoji Simulation";
-            if (newData.meta.description) {
-                 console.log("Model.loadModelData: Removing legacy 'description'.");
-                delete newData.meta.description;
-            }
-            // --- REMOVED GRID LOADING LOGIC AS PER USER REQUEST ---
-            // if (newData.gridState) {
-            //    console.log("Model.loadModelData: Saved grid state found.");
-            //    // Grid.initialize will handle using this if it exists
-            // }
+            if (newData.meta.description) delete newData.meta.description;
+            // --- End data prep ---
 
             // *** Replace current data ***
             Model.data = newData;
-            Model.backup = JSON.parse(JSON.stringify(Model.data)); // Update backup too
+            Model.backup = JSON.parse(JSON.stringify(Model.data));
             console.log("Model.loadModelData: Model.data replaced.");
 
-            // Re-initialize Grid with new data
-            Grid.reinitialize(); // Calls Grid.initialize which now checks Model.data
+            // *** Re-initialize Grid (Depends only on Model.data) ***
+            Grid.reinitialize();
 
-            // Rebuild Editor UI
-            if (UI.options.edit !== UI.NONE && Editor.dom) {
-                while (Editor.dom.firstChild) {
-                    Editor.dom.removeChild(Editor.dom.firstChild);
-                }
-                Editor.create();
-                if (Editor.updateTitleUI) Editor.updateTitleUI();
-                 console.log("Model.loadModelData: Editor rebuilt.");
-            } else {
-                 if (Editor.updateTitleUI) Editor.updateTitleUI();
-            }
-
-            // Update tab title
+            // *** Update Tab Title (Depends only on Model.data) ***
             document.title = (Model.data.meta.title || "Untitled Emoji Simulation") + " - Emoji Simulator! 😘";
 
-            // Reset playback state based on loaded meta
+            // *** Set Model's internal playback state (Doesn't need UI) ***
             Model.isPlaying = newData.meta.play !== undefined ? newData.meta.play : true;
-            UI.options.paused = !Model.isPlaying;
+            console.log("Model.loadModelData: Model.isPlaying set to:", Model.isPlaying);
 
-            // Update grid display
-            publish("/grid/updateAgents");
 
-            window.hasUnsavedChanges = false; // Reset unsaved flag
+            // *** Trigger UI rebuilds via events AFTER data is loaded ***
 
-            // Publish event AFTER everything is rebuilt/reset
-            publish("/model/init"); // Notify UI controls (like playback)
-            console.log("Model.js: Model loaded successfully via loadModelData.");
+            // 1. Trigger Editor rebuild (Editor.js listens)
+            publish("/model/load/success"); // << NEW EVENT
 
-            // Update URL only AFTER successful load
-             Save.updateURL();
+            // 2. Trigger Grid display update (Grid.js listens)
+            publish("/grid/updateAgents"); // Show the initial state of the loaded model
+
+            // 3. Reset unsaved flag
+            window.hasUnsavedChanges = false;
+
+            // 4. Publish general init event (for Playback controls, etc. in UI.js)
+            //    This MUST happen AFTER model state (like isPlaying) is set.
+            publish("/model/init");
+
+            console.log("Model.js: Model loaded successfully via loadModelData. Events published.");
+
+            // 5. Update URL (after everything else)
+            Save.updateURL();
 
         } catch (error) {
             console.error("Model.js: Failed inside loadModelData:", error);
