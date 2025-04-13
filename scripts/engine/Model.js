@@ -182,7 +182,7 @@ as well as serialize & deserialize.
             console.error("Model.js: Failed inside loadModelData:", error);
             alert("Error processing simulation data. It might be invalid or corrupted.\n\n" + error.message);
         }
-    };
+    }
     console.log("Model.js: Model.loadModelData function defined. Type:", typeof Model.loadModelData);
 
 
