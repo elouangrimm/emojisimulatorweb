@@ -119,60 +119,95 @@ Grid.domContainer = document.getElementById("grid_container");
 Grid.css = document.getElementById("grid_style");
 Grid.tileSize = 1;
 Grid.updateSize = function(){
+	console.log("Grid.updateSize called"); // Log when called
 
-	// RESIZE OTHER DOMs
-	// Apparently CSS calc() isn't playing nice in Firefox, WHATEVER
-	var calcWidth = (document.body.clientWidth - editor_container.clientWidth)+"px";
-	var calcHeight = (document.body.clientHeight - play_container.clientHeight)+"px";
-	grid_container.style.width = calcWidth;
-	grid_container.style.height = calcHeight;
-	play_container.style.width = calcWidth;
+	// Ensure grid container and array exist
+	if (!Grid.domContainer || !Grid.array || !Grid.array[0]) {
+		 console.warn("Grid.updateSize: Cannot update size, elements missing.");
+		return;
+	}
 
-	// DIMENSIONS
-	var maxWidth = Grid.domContainer.clientWidth;
-	var maxHeight = Grid.domContainer.clientHeight;
-	var w = Grid.array[0].length;
-	var h = Grid.array.length;
-	var t = Math.min(Math.floor(maxWidth/w), Math.floor(maxHeight/h));
+
+	// RESIZE OTHER DOMs (Play container, etc.) - Maybe move this elsewhere if not grid specific
+	// const editor_container = document.getElementById("editor_container"); // Get it if needed
+	// const play_container = document.getElementById("play_container");
+	// if (grid_container && editor_container && play_container) {
+	//     const availableWidth = document.body.clientWidth - editor_container.offsetWidth; // Calculate based on actual editor width
+	//     grid_container.style.width = `${availableWidth}px`;
+	//     play_container.style.width = `${availableWidth}px`;
+	//     // Height calculation might need review depending on layout
+	//     grid_container.style.height = `calc(100vh - ${play_container.offsetHeight}px)`;
+
+	// }
+
+
+	// --- Calculate Tile Size ---
+	const maxWidth = Grid.domContainer.clientWidth;
+	const maxHeight = Grid.domContainer.clientHeight;
+	const w = Grid.array[0].length;
+	const h = Grid.array.length;
+
+	// Ensure w, h, maxWidth, maxHeight are valid numbers > 0
+	if (w <= 0 || h <= 0 || maxWidth <= 0 || maxHeight <= 0) {
+		console.warn("Grid.updateSize: Invalid dimensions for calculation.");
+		return; // Avoid division by zero or incorrect sizing
+	}
+
+	const t = Math.max(1, Math.min(Math.floor(maxWidth / w), Math.floor(maxHeight / h))); // Ensure tile size >= 1
 	Grid.tileSize = t;
+	console.log(`Grid.updateSize: New tile size = ${t}`);
 
-	// STYLE
-	var css = "";
 
-	// Grid tiles
-	css += "#grid{ width:"+(w*t)+"px; height:"+(h*t)+"px; font-size:"+t+"px; }\n";
-	css += "#grid>div{ width:"+(w*t)+"px; height:"+t+"px; }\n";
-	css += "#grid>div>div{ width:"+t+"px; height:"+t+"px; }\n";
+	// --- Update CSS ---
+	let css = ""; // Use let
+	const gridWidth = w * t;
+	const gridHeight = h * t;
 
-	// Grid BG - absolute
-	css += "#grid_bg{ width:"+(w*t)+"px; height:"+(h*t)+"px; font-size:"+t+"px; }\n";
-	/*css += "#grid_bg>div{ width:"+(w*t)+"px; height:"+t+"px; }\n";
-	css += "#grid_bg>div>div{ width:"+(t-2)+"px; height:"+(t-2)+"px; }\n";*/
-	css += "#grid_bg>div{ width:"+(t-2)+"px; height:"+(t-2)+"px; }\n"
+	// Grid container positioning (ensure it's centered if needed by parent flex)
+	 css += `#grid_container { /* Styles for centering if needed */ } \n`;
+
+	// Position #grid and #grid_bg within the centered container
+	 css += `#grid, #grid_bg { width:${gridWidth}px; height:${gridHeight}px; font-size:${t}px; }\n`;
+
+	// Style individual cells (#grid > div > div)
+	css += `#grid > div { width:${gridWidth}px; height:${t}px; }\n`; // Row wrapper
+	css += `#grid > div > div { width:${t}px; height:${t}px; }\n`; // Cell
+
+	// Style background grid cells (#grid_bg > div)
+	css += `#grid_bg > div { width:${t-1}px; height:${t-1}px; border: 1px solid #e0e0e0; }\n`; // Adjusted border/size
 
 	// Apply CSS
-	Grid.css.innerHTML = css;
+	if (Grid.css) Grid.css.innerHTML = css;
 
-	// HTML JUST FOR THE GRID BACKGROUND
-	var html = "";
-	for(var y=0;y<Grid.array.length;y++){
-		for(var x=0;x<Grid.array[0].length;x++){
-			var top = Math.floor(t*y);
-			var left = Math.floor(t*x);
-			html += "<div style='top:"+top+"px; left:"+left+"px'></div>";
+
+	// --- Rebuild Grid Background HTML ---
+	let bg_html = ""; // Use let
+	for(let y = 0; y < h; y++){
+		for(let x = 0; x < w; x++){
+			const top = Math.floor(t * y);
+			const left = Math.floor(t * x);
+			// Add inline styles directly for positioning bg divs
+			bg_html += `<div style='top:${top}px; left:${left}px; width:${t-1}px; height:${t-1}px;'></div>`;
 		}
 	}
-	Grid.bg.innerHTML = html;
+	 if (Grid.bg) Grid.bg.innerHTML = bg_html; // Update background grid
 
-	// HTML FOR THE REAL GRID
-	var html = "";
-	for(var y=0;y<Grid.array.length;y++){
-		html += "<div>";
-		for(var x=0;x<Grid.array[0].length;x++) html += "<div></div>";
-		html += "</div>";
+
+	// --- Rebuild *Structure* of Real Grid HTML (Rows and Divs) ---
+	// This part ensures the DOM structure matches the grid dimensions
+	// It does NOT reset the content (emoji) inside the cells.
+	let grid_html = ""; // Use let
+	for(let y = 0; y < h; y++){
+		grid_html += "<div>"; // Row
+		for(let x = 0; x < w; x++) grid_html += `<div>${Grid.array[y][x] ? Model.getStateByID(Grid.array[y][x].stateID)?.icon || '' : ''}</div>`; // Cell + current content
+		grid_html += "</div>";
 	}
-	Grid.dom.innerHTML = html;
+	 if (Grid.dom) Grid.dom.innerHTML = grid_html; // Rebuild grid structure with current content
 
+	// *** DO NOT REINITIALIZE OR REDRAW AGENTS HERE ***
+	// Grid.reinitialize(); // << REMOVE THIS if present
+	// publish("/grid/updateAgents"); // << REMOVE THIS (unless needed to fix rendering artifacts after structural change)
+	console.log("Grid.updateSize finished without reinitializing agents.");
 };
 subscribe("/grid/updateSize",Grid.updateSize,false);
 subscribe("ui/resize",Grid.updateSize,false);

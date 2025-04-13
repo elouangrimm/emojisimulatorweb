@@ -247,12 +247,12 @@ THE EDITOR
 
 /* State Container */
 #editor .editor_state {
-	margin-bottom: 25px;
+	margin-bottom: 20px;
 	background-color: #fffbfe;
 	/* M3 Surface */
 	border-radius: 12px;
 	/* Rounded corners */
-	padding: 15px;
+	padding: 10px 15px;
 	border: 1px solid #cac4d0;
 	/* Outline */
 	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -373,27 +373,59 @@ THE EDITOR
 
 /* Action UI List */
 #editor .editor_actions ul {
-	margin: 10px 0 5px 25px;
-	/* Adjust margins */
+	margin: 5px 0 5px 25px;
+	/* Reduced top/bottom margin */
 	padding-left: 0;
-	/* Remove default padding */
 	list-style-type: none;
 	position: relative;
 	border-left: none;
-	/* Remove dashed line */
 }
 
 #editor .editor_actions li {
-	padding-left: 0;
-	/* Remove padding */
-	margin-bottom: 8px;
-	/* Spacing between lines */
-	min-height: auto;
-	/* Remove min-height */
+	padding: 2px 0 2px 10px;
+	/* Reduced padding, keep left padding for indent */
+	margin-bottom: 4px;
+	/* Reduced spacing */
 	display: block;
-	/* Allow inline children to wrap */
-	line-height: 1.6;
-	/* Match text */
+	/* LI itself is block */
+	line-height: 1.5;
+	/* Adjust line height */
+	position: relative;
+	/* Needed for delete button */
+}
+
+/* Force inline-block for direct children that are controls/text */
+#editor .editor_actions li>span,
+/* Labels created by EditorHelper */
+#editor .editor_actions li>select,
+/* Select dropdowns */
+#editor .editor_actions li>input[type=text].editor_number,
+/* Number inputs */
+/* Add other specific controls if needed */
+#editor .editor_actions li>.editor_state_selector_container
+
+/* Example if you wrapped state selector */
+	{
+	display: inline-block;
+	/* Use inline-block for better spacing control */
+	vertical-align: middle;
+	/* Align vertically */
+	margin-left: 0;
+	margin-right: 5px;
+	/* Space between inline elements */
+	margin-bottom: 2px;
+	/* Allow slight wrap spacing */
+	padding: 0;
+	/* Reset padding */
+	font-size: inherit;
+}
+
+#editor .editor_actions li > div:not(.delete_action):not(.editor_new_action_container) {
+	display: inline; /* Try forcing simple inline first */
+	/* If inline causes issues, try inline-block: */
+	/* display: inline-block; */
+	/* vertical-align: middle; */
+	/* margin-right: 5px; */
 }
 
 #editor li>span,
@@ -410,6 +442,12 @@ THE EDITOR
 	/* Ensure inline */
 	margin-right: 4px;
 	/* Space after labels */
+}
+
+/* Add slight bottom margin specifically to nested action UIs if needed */
+#editor .editor_actions li .editor_actions { /* Nested actions */
+    margin-top: 5px;
+    margin-bottom: 5px;
 }
 
 #editor li>select,

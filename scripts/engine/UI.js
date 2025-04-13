@@ -134,7 +134,7 @@
             clearTimeout(resizeDebounceTimeout);
             const delay = immediate ? 0 : 50; // Shorter delay during drag, immediate on mouseup
             resizeDebounceTimeout = setTimeout(() => {
-                // console.log("Publishing ui/resize"); // Debug log
+                console.log(`Publishing ui/resize (Immediate: ${immediate})`);
                 publish("ui/resize"); // Publish event for grid etc.
                 // Update Perfect Scrollbar after resize calculation is done
                 if (window.Ps && editorContainer) {
@@ -206,14 +206,45 @@
         } else {
             play_draw_icon_container.innerHTML = " "; // Blank if state not found
             play_draw.title = "Select Draw Brush";
-            // Resetting logic...
+            if (Model.data.meta.draw !== 0) {
+                console.warn(
+                    `Draw state ID ${Model.data.meta.draw} not found, resetting to 0.`
+                );
+                Model.data.meta.draw = 0;
+                window.hasUnsavedChanges = true;
+                Save.updateURL();
+                _updateBrushIcon(); // Retry update
+            }
         }
     };
 
     // Inside play_draw.onclick, update reference if needed (or just use container directly)
     if (play_draw) {
         play_draw.onclick = function () {
-            // ... (logic to get next state) ...
+            if (
+                !Model.data ||
+                !Model.data.states ||
+                Model.data.states.length === 0
+            )
+                return;
+
+            // Get current state and index
+            const currentStateId = Model.data.meta.draw;
+            const stateIndex = Model.data.states.findIndex(
+                (s) => s.id == currentStateId
+            ); // Find by ID
+
+            // Calculate next index, ensuring it loops correctly
+            let nextIndex = 0; // Default to first state
+            if (stateIndex !== -1) {
+                // If current state was found
+                nextIndex = (stateIndex + 1) % Model.data.states.length;
+            } else {
+                console.warn(
+                    `Current draw state ID ${currentStateId} not found. Resetting to first state.`
+                );
+            }
+            let nextIndex = 0;
             if (nextState) {
                 Model.data.meta.draw = nextState.id;
                 _updateBrushIcon(); // Update brush icon display
@@ -607,23 +638,28 @@
             Ps.initialize(editor_container, {
                 suppressScrollX: true,
                 wheelSpeed: 0.7,
-                minScrollbarLength: 20
+                minScrollbarLength: 20,
             });
 
             // Ensure updates happen (resize, model init, reset)
             // These listeners should already be present from previous steps
-            window.addEventListener("resize", function(){ Ps.update(editor_container); });
-            subscribe("/model/init", function(){ Ps.update(editor_container); });
-            subscribe("/meta/reset/complete", function(){ // Use correct event
+            window.addEventListener("resize", function () {
+                Ps.update(editor_container);
+            });
+            subscribe("/model/init", function () {
+                Ps.update(editor_container);
+            });
+            subscribe("/meta/reset/complete", function () {
+                // Use correct event
                 editor_container.scrollTop = 0;
                 Ps.update(editor_container);
             });
             // Add update after rebuild too
-            subscribe("/model/load/success", function(){ // When model is loaded
+            subscribe("/model/load/success", function () {
+                // When model is loaded
                 editor_container.scrollTop = 0; // Scroll to top
-                 Ps.update(editor_container);
+                Ps.update(editor_container);
             });
-
         } catch (e) {
             console.error("Failed to initialize Perfect Scrollbar:", e);
             // Fallback to native scrollbar
