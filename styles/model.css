@@ -39,7 +39,7 @@ div, input, select, textarea, button {
 	height: 100vh;
 	/* Full height minus play controls */
 	position: relative;
-	background-color: #ffffff;
+	background-color: #000000;
 	/* Black background for grid area */
 	display: flex;
 	/* Center the grid */
@@ -63,7 +63,7 @@ div, input, select, textarea, button {
 	height: 100vh;
 	/* Full height */
 	/* ... other editor_container styles ... */
-	position: relative;
+	position: relative !important;
 	/* Important for perfect-scrollbar */
 	overflow: hidden !important;
 }
@@ -152,7 +152,7 @@ THE GRID
 	/* margin: auto; top:0; left:0; right:0; bottom:0; */
 	/* Handled by flexbox parent now */
 	cursor: default;
-	border: 1px solid #444444;
+	border: 1px solid #55555;
 	/* Darker border for grid */
 	box-sizing: content-box;
 	/* Make border outside */
@@ -168,14 +168,14 @@ THE GRID
 	/* Center emoji better */
 	justify-content: center;
 	align-items: center;
-	color: #1c1b1f;
+	color: #e0e0e0;
 	/* White emoji on black */
 }
 
 #grid_bg>div {
 	/* BG Cell */
 	position: absolute;
-	border: 1px solid #2a2a2a;
+	border: 1px solid #333333;
 	/* Very dark grid lines */
 	/* Remove background color from here */
 	box-sizing: border-box;
@@ -200,7 +200,7 @@ THE EDITOR
 	/* MUST have height for Ps */
 	width: 100%;
 	/* MUST have width */
-	overflow: hidden !important;
+	overflow: auto;
 	/* Ps adds its own scrollbars */
 	padding: 20px;
 	/* Keep padding */
@@ -420,8 +420,9 @@ THE EDITOR
 	font-size: inherit;
 }
 
-#editor .editor_actions li > div:not(.delete_action):not(.editor_new_action_container) {
-	display: inline; /* Try forcing simple inline first */
+#editor .editor_actions li>div:not(.delete_action):not(.editor_new_action_container) {
+	display: inline;
+	/* Try forcing simple inline first */
 	/* If inline causes issues, try inline-block: */
 	/* display: inline-block; */
 	/* vertical-align: middle; */
@@ -445,9 +446,10 @@ THE EDITOR
 }
 
 /* Add slight bottom margin specifically to nested action UIs if needed */
-#editor .editor_actions li .editor_actions { /* Nested actions */
-    margin-top: 5px;
-    margin-bottom: 5px;
+#editor .editor_actions li .editor_actions {
+	/* Nested actions */
+	margin-top: 5px;
+	margin-bottom: 5px;
 }
 
 #editor li>select,
@@ -982,6 +984,8 @@ THE PLAY CONTROLS
 		'wght'400,
 		'GRAD'0,
 		'opsz'24;
+	visibility: visible;
+
 }
 
 #play_controls>.control_button:hover {
@@ -1009,10 +1013,13 @@ THE PLAY CONTROLS
 	padding: 0;
 	/* Remove padding */
 	box-sizing: border-box;
-	visibility: visible;
 	/* Explicitly visible */
-	opacity: 1;
+	opacity: 1 !important;
 	/* Explicitly opaque */
+	visibility: visible !important;
+	overflow: visible;
+	border: 1px dotted red;
+	/* TEMPORARY: Add border to see container */
 }
 
 #play_controls>.control_speed>input[type=range] {
@@ -1022,25 +1029,33 @@ THE PLAY CONTROLS
 	/* Add margin below */
 	cursor: pointer;
 	-webkit-appearance: none;
-	appearance: none;
+	appearance: auto;
 	background: #d9d4de;
 	border-radius: 4px;
 	outline: none;
 	display: block;
 	/* Make sure it's block */
-	visibility: visible;
+	visibility: visible !important;
 	/* Explicitly visible */
 	opacity: 1;
 	/* Explicitly opaque */
+	border: 1px dotted blue;
 }
 
 /* Thumb styles should already be defined - check them */
 #play_controls>.control_speed>input[type=range]::-webkit-slider-thumb {
-	/* ... keep thumb styles ... */
+	-webkit-appearance: none;
+	appearance: none;
+	background: #6750a4;
+	border-radius: 50%;
+	cursor: pointer;
+	margin-top: -4px;
+	/* Adjust vertical alignment if needed */
 	visibility: visible;
 	/* Explicitly visible */
 	opacity: 1;
 	/* Explicitly opaque */
+	width: 16px; height: 16px;
 }
 
 #play_controls>.control_speed>input[type=range]::-moz-range-thumb {
@@ -1049,6 +1064,7 @@ THE PLAY CONTROLS
 	/* Explicitly visible */
 	opacity: 1;
 	/* Explicitly opaque */
+	width: 16px; height: 16px;
 }
 
 #play_controls>.control_speed>.speed_labels {
@@ -1111,6 +1127,7 @@ THE PLAY CONTROLS
 	align-items: center;
 	overflow: hidden;
 	/* Hide overflowing emoji parts */
+	visibility: visible;
 }
 
 
@@ -1166,7 +1183,7 @@ THE PLAY CONTROLS
 }
 
 #play_controls[basic]>.control_speed {
-	display: none;
+	/* display: none; */
 }
 
 #play_controls[basic]>#play_step {

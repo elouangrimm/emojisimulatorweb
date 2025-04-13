@@ -189,10 +189,6 @@
         }
     };
 
-    const play_draw_icon_container = document.getElementById(
-        "play_draw_icon_container"
-    );
-
     // Inside _updateBrushIcon
     const _updateBrushIcon = function () {
         // Use the container found above
@@ -311,14 +307,21 @@
 
     const play_draw = document.getElementById("play_draw");
     const play_draw_icon = document.querySelector("#play_draw > div");
+    const play_draw_icon_container = document.getElementById(
+        "play_draw_icon_container"
+    );
 
     const _updateBrushIcon = function () {
         // Define before use
+        if (!play_draw_icon_container || !Model.data?.meta) return;
         if (!play_draw_icon || !Model.data || !Model.data.meta) return;
         const state = Model.getStateByID(Model.data.meta.draw);
         if (state) {
             play_draw_icon.innerHTML = state.icon || "?"; // Fallback icon
-            play_draw.title = `Drawing: ${state.name} (${state.icon})`; // Update title
+            if (play_draw)
+                play_draw.title = `Drawing: ${state.name} (${
+                    state.icon || "?"
+                })`; // Update title
         } else {
             play_draw_icon.innerHTML = " "; // Blank if state not found
             play_draw.title = "Select Draw Brush";
@@ -629,6 +632,53 @@
     /////////////////////////
     //// SCROLLING STUFF ////
     /////////////////////////
+
+    const editor_container_for_ps = document.getElementById("editor_container"); // Use distinct variable name
+    if (editor_container_for_ps) {
+        try {
+            console.log(
+                "Initializing PerfectScrollbar on:",
+                editor_container_for_ps
+            );
+            Ps.initialize(editor_container_for_ps, {
+                // Target the CONTAINER
+                suppressScrollX: true,
+                // wheelSpeed: 0.7, // Keep customizations
+                // minScrollbarLength: 20
+            });
+            // Ensure Ps.update calls target the same element
+            window.addEventListener("resize", function () {
+                try {
+                    Ps.update(editor_container_for_ps);
+                } catch (e) {}
+            });
+            subscribe("/model/init", function () {
+                try {
+                    Ps.update(editor_container_for_ps);
+                } catch (e) {}
+            });
+            subscribe("/meta/reset/complete", function () {
+                try {
+                    editor_container_for_ps.scrollTop = 0;
+                    Ps.update(editor_container_for_ps);
+                } catch (e) {}
+            });
+            subscribe("/model/load/success", function () {
+                try {
+                    editor_container_for_ps.scrollTop = 0;
+                    Ps.update(editor_container_for_ps);
+                } catch (e) {}
+            });
+            console.log("PerfectScrollbar initialized and listeners attached.");
+        } catch (e) {
+            console.error("Failed to initialize/update Perfect Scrollbar:", e);
+            editor_container_for_ps.style.overflowY = "auto"; // Fallback
+        }
+    } else {
+        console.error(
+            "Cannot initialize PerfectScrollbar: #editor_container not found."
+        );
+    }
     const editor_container = document.getElementById("editor_container");
     if (editor_container) {
         // Initialize Perfect Scrollbar if the container exists
