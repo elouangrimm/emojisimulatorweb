@@ -27,7 +27,7 @@ div, input, select, textarea, button {
     flex-grow: 1; /* Take remaining space */
     height: calc(100vh - 60px); /* Full height minus play controls */
     position: relative;
-    background-color: #000000; /* Black background for grid area */
+    background-color: #ffffff; /* Black background for grid area */
     display: flex; /* Center the grid */
     justify-content: center;
     align-items: center;
@@ -70,7 +70,7 @@ THE GRID
     position: absolute; /* Keep absolute positioning within centered container */
     /* margin: auto; top:0; left:0; right:0; bottom:0; */ /* Handled by flexbox parent now */
     cursor: default;
-    border: 1px solid #444; /* Darker border for grid */
+    border: 1px solid #444444; /* Darker border for grid */
     box-sizing: content-box; /* Make border outside */
 }
 
@@ -81,7 +81,7 @@ THE GRID
     display: flex; /* Center emoji better */
     justify-content: center;
     align-items: center;
-    color: #fff; /* White emoji on black */
+    color: #1c1b1f; /* White emoji on black */
 }
 
 #grid_bg > div { /* BG Cell */
