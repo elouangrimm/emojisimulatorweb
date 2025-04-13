@@ -425,7 +425,7 @@
                     Editor.shareUrlInput.select();
                 }
             }
-        });
+        })
 
         // Update dropdown when local saves change
         subscribe(
