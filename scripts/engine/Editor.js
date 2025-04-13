@@ -210,7 +210,7 @@
 		});
 		subscribe("/save/localStorage/success", Editor.populateSavedSimsDropdown);
 	
-	};
+	}
 
         Editor.dom.appendChild(addStateButton);
 
