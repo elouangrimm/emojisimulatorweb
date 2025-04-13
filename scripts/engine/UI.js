@@ -240,7 +240,6 @@
                     `Current draw state ID ${currentStateId} not found. Resetting to first state.`
                 );
             }
-            let nextIndex = 0;
             if (nextState) {
                 Model.data.meta.draw = nextState.id;
                 _updateBrushIcon(); // Update brush icon display
