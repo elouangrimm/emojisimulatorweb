@@ -156,14 +156,46 @@
     const play_reset = document.getElementById("play_reset");
     if (play_reset) {
         play_reset.onclick = function () {
-            if (
-                window.hasUnsavedChanges &&
-                !confirm("Discard Unsaved Changes?")
-            )
-                return; // Don't reset if user cancels
-            Model.returnToBackup(); // Use backup which doesn't have unsaved changes flag set initially
-            // No need to reinitialize Grid here, Model.returnToBackup handles it
-            publish("/notify/info", ["Simulation reset to original state."]);
+            console.log("UI: Clearing grid...");
+
+            // Check if Grid and Model are ready
+            if (window.Grid && Grid.array && window.Model) {
+                // Iterate through the grid and set all agents to state 0
+                for (let y = 0; y < Grid.array.length; y++) {
+                    if (Grid.array[y]) { // Check if row exists
+                        for (let x = 0; x < Grid.array[y].length; x++) {
+                             const agent = Grid.array[y][x];
+                             if (agent) { // Check if agent exists
+                                 agent.forceState(0); // Force state to 0 (empty)
+                             }
+                        }
+                    }
+                }
+
+                // Update the visual display
+                publish("/grid/updateAgents");
+
+                // Mark this action as an unsaved change
+                window.hasUnsavedChanges = true;
+
+                // Update the URL to reflect the cleared grid state (if grid state saving is enabled)
+                // Or just update URL based on rules if grid state saving is off
+                Save.updateURL();
+
+                // Notify user
+                publish("/notify/info", ["Grid cleared."]);
+
+                // Optionally pause the simulation when clearing?
+                 if (Model.isPlaying) {
+                     Model.pause();
+                     updatePauseUI(); // Update button visual
+                 }
+
+
+            } else {
+                console.error("UI: Cannot clear grid - Grid or Model not ready.");
+                publish("/notify/error", ["Error clearing grid."]);
+            }
         };
     }
 

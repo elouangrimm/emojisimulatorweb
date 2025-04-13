@@ -39,7 +39,7 @@ div, input, select, textarea, button {
 	height: 100vh;
 	/* Full height minus play controls */
 	position: relative;
-	background-color: #000000;
+	background-color: #e0e0e0;
 	/* Black background for grid area */
 	display: flex;
 	/* Center the grid */
@@ -152,7 +152,7 @@ THE GRID
 	/* margin: auto; top:0; left:0; right:0; bottom:0; */
 	/* Handled by flexbox parent now */
 	cursor: default;
-	border: 1px solid #55555;
+	border: 1px solid #888888;
 	/* Darker border for grid */
 	box-sizing: content-box;
 	/* Make border outside */
@@ -175,7 +175,7 @@ THE GRID
 #grid_bg>div {
 	/* BG Cell */
 	position: absolute;
-	border: 1px solid #333333;
+	border: 1px solid #222222;
 	/* Very dark grid lines */
 	/* Remove background color from here */
 	box-sizing: border-box;
