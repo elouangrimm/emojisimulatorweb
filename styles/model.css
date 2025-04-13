@@ -3,7 +3,7 @@
 body {
 	margin: 0;
 	overflow: hidden;
-	display: none;
+	display: flex;
 	/* Keep this, JS will set to block */
 	font-family: 'Roboto', 'OpenSansEmoji', Helvetica, Arial, sans-serif;
 	/* Add Roboto preference */
@@ -33,8 +33,10 @@ div, input, select, textarea, button {
 	/* width: 60%; */
 	/* Let flexbox handle width */
 	flex-grow: 1;
+	flex-shrink: 1;
+	min-width: 300px;
 	/* Take remaining space */
-	height: calc(100vh - 60px);
+	height: 100vh;
 	/* Full height minus play controls */
 	position: relative;
 	background-color: #ffffff;
@@ -48,21 +50,69 @@ div, input, select, textarea, button {
 }
 
 #editor_container {
-	width: 380px;
-	/* Fixed width for editor */
-	min-width: 340px;
+	flex-basis: 380px;
+	/* Initial desired width */
+	flex-grow: 0;
+	/* Don't grow */
+	flex-shrink: 0;
+	/* Don't shrink by default */
+	min-width: 300px;
+	/* Minimum sensible width */
+	max-width: 70%;
+	/* Maximum sensible width (relative to viewport) */
 	height: 100vh;
 	/* Full height */
-	background: #f3f0f4;
-	/* Material 3 Surface Container Low */
-	overflow-y: scroll;
-	/* Keep scroll */
-	border-left: 1px solid #cac4d0;
-	/* Divider */
+	/* ... other editor_container styles ... */
 	position: relative;
-	/* Needed for perfect-scrollbar */
+	/* Important for perfect-scrollbar */
+	overflow: hidden;
+}
+
+#editor_resizer {
+	flex-basis: 8px;
+	/* Width of the handle */
+	flex-grow: 0;
 	flex-shrink: 0;
-	/* Don't shrink */
+	height: 100vh;
+	/* Full height */
+	background-color: #cac4d0;
+	/* M3 Outline / Divider color */
+	cursor: col-resize;
+	/* Indicate horizontal resizing */
+	transition: background-color 0.2s ease;
+	z-index: 5;
+	/* Above grid/editor background, below controls? */
+}
+
+#editor_resizer:hover {
+	background-color: #79747e;
+	/* Darker on hover */
+}
+
+#editor_resizer:active {
+	background-color: #6750a4;
+	/* Primary color when dragging */
+}
+
+body.is-resizing {
+	cursor: col-resize;
+	/* Change cursor for whole page */
+	user-select: none;
+	/* Disable text selection */
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+}
+
+body.is-resizing * {
+	/* Apply to children too */
+	pointer-events: none;
+	/* Prevent interaction with other elements during resize */
+}
+
+/* Allow interaction ONLY with the resizer itself during resize */
+body.is-resizing #editor_resizer {
+	pointer-events: auto;
 }
 
 #play_container {
@@ -84,10 +134,12 @@ div, input, select, textarea, button {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	padding: 0 10px;
+	padding: 0 20px;
 	/* Padding */
 	z-index: 10;
 	/* Above grid */
+	width: 100%;
+	box-sizing: border-box;
 }
 
 
@@ -131,6 +183,15 @@ THE GRID
 
 /* #grid_bg is now handled by #grid_container */
 
+.ps-container {
+	/* Apply this to #editor_container's child */
+	height: 100%;
+	width: 100%;
+	overflow: hidden !important;
+	/* Override default */
+	position: relative;
+	/* Needed for scrollbar positioning */
+}
 
 /***************
 THE EDITOR
@@ -140,6 +201,8 @@ THE EDITOR
 	/* Adjusted padding */
 	margin: 0;
 	/* Remove margin */
+	height: 100%;
+	overflow: hidden;
 }
 
 #editor .editor_title {
@@ -814,48 +877,57 @@ THE PLAY CONTROLS
 	box-sizing: border-box;
 }
 
-#play_controls > .control_speed > input[type=range] {
-    width: 100%;
-    height: 8px; /* Explicit height */
-    margin: 0 0 2px 0; /* Margin below slider */
-    cursor: pointer;
-    /* Appearance styles already defined, ensure they are correct */
-    -webkit-appearance: none;
-    appearance: none;
-    background: #d9d4de;
-    border-radius: 4px;
-    outline: none;
-    display: block; /* Ensure it's block */
-}
- /* Ensure thumbs are styled correctly */
-#play_controls > .control_speed > input[type=range]::-webkit-slider-thumb {
-     -webkit-appearance: none;
-     appearance: none;
-     width: 16px;
-     height: 16px;
-     background: #6750a4;
-     border-radius: 50%;
-     cursor: pointer;
-     margin-top: -4px; /* Adjust vertical alignment if needed */
-}
-#play_controls > .control_speed > input[type=range]::-moz-range-thumb {
-     width: 16px;
-     height: 16px;
-     background: #6750a4;
-     border-radius: 50%;
-     cursor: pointer;
-     border: none;
+#play_controls>.control_speed>input[type=range] {
+	width: 100%;
+	height: 8px;
+	/* Explicit height */
+	margin: 0 0 2px 0;
+	/* Margin below slider */
+	cursor: pointer;
+	/* Appearance styles already defined, ensure they are correct */
+	-webkit-appearance: none;
+	appearance: none;
+	background: #d9d4de;
+	border-radius: 4px;
+	outline: none;
+	display: block;
+	/* Ensure it's block */
 }
 
-#play_controls > .control_speed > .speed_labels {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-    font-size: 11px;
-    color: #49454f;
-    /* margin-top: 2px; */ /* Removed, spacing handled by container */
-    padding: 0 2px; /* Small padding for labels */
-    line-height: 1; /* Prevent extra height */
+/* Ensure thumbs are styled correctly */
+#play_controls>.control_speed>input[type=range]::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	appearance: none;
+	width: 16px;
+	height: 16px;
+	background: #6750a4;
+	border-radius: 50%;
+	cursor: pointer;
+	margin-top: -4px;
+	/* Adjust vertical alignment if needed */
+}
+
+#play_controls>.control_speed>input[type=range]::-moz-range-thumb {
+	width: 16px;
+	height: 16px;
+	background: #6750a4;
+	border-radius: 50%;
+	cursor: pointer;
+	border: none;
+}
+
+#play_controls>.control_speed>.speed_labels {
+	display: flex;
+	justify-content: space-between;
+	width: 100%;
+	font-size: 11px;
+	color: #49454f;
+	/* margin-top: 2px; */
+	/* Removed, spacing handled by container */
+	padding: 0 2px;
+	/* Small padding for labels */
+	line-height: 1;
+	/* Prevent extra height */
 }
 
 /* Specific Button Widths (Removed - use padding) */

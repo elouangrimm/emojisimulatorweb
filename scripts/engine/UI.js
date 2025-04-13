@@ -56,6 +56,92 @@
             css.innerHTML = "#grid_bg{ display:none; } #grid{color:#1c1b1f}"; // Use M3 text color
     }
 
+	const editorContainer = document.getElementById('editor_container');
+    const gridContainer = document.getElementById('grid_container'); // Get grid container too
+    const resizer = document.getElementById('editor_resizer');
+
+    let isResizing = false;
+    let startX = 0;
+    let initialEditorWidth = 0;
+    const minEditorWidth = 280; // Minimum pixel width for editor
+
+    if (resizer && editorContainer && gridContainer) { // Check if elements exist
+
+        resizer.addEventListener('mousedown', (e) => {
+            if (e.button !== 0) return; // Only main button
+            isResizing = true;
+            startX = e.clientX;
+            initialEditorWidth = editorContainer.offsetWidth;
+            document.body.classList.add('is-resizing'); // Add class to prevent selection
+
+            // Attach listeners to window for dragging anywhere
+            window.addEventListener('mousemove', handleMouseMove);
+            window.addEventListener('mouseup', handleMouseUp);
+
+            e.preventDefault(); // Prevent default drag behavior
+        });
+
+        const handleMouseMove = (e) => {
+            if (!isResizing) return;
+
+            const currentX = e.clientX;
+            const deltaX = currentX - startX;
+            let newEditorWidth = initialEditorWidth - deltaX; // Drag right decreases editor width
+
+            // Apply constraints
+            const maxEditorWidth = window.innerWidth * 0.7; // Example: max 70% of window
+            newEditorWidth = Math.max(minEditorWidth, Math.min(newEditorWidth, maxEditorWidth));
+
+            // Apply styles for flexbox resizing
+            editorContainer.style.flexBasis = `${newEditorWidth}px`;
+
+            // --- Trigger debounced resize ---
+            triggerDebouncedResize();
+
+            // Prevent default text selection behavior which can interfere
+             e.preventDefault();
+        };
+
+        const handleMouseUp = (e) => {
+            if (isResizing) {
+                isResizing = false;
+                document.body.classList.remove('is-resizing'); // Remove class
+
+                // Remove window listeners
+                window.removeEventListener('mousemove', handleMouseMove);
+                window.removeEventListener('mouseup', handleMouseUp);
+
+                // --- Trigger final resize ---
+                triggerDebouncedResize(true); // Force immediate trigger on mouse up
+
+                // Update Perfect Scrollbar if it exists
+                if (window.Ps && editorContainer) {
+                    try { Ps.update(editorContainer); } catch(err){}
+                }
+                 console.log("Resizing ended.");
+            }
+        };
+
+        // --- Debounced Resize Publisher ---
+        let resizeDebounceTimeout = null;
+        const triggerDebouncedResize = (immediate = false) => {
+             clearTimeout(resizeDebounceTimeout);
+             const delay = immediate ? 0 : 50; // Shorter delay during drag, immediate on mouseup
+             resizeDebounceTimeout = setTimeout(() => {
+                  // console.log("Publishing ui/resize"); // Debug log
+                  publish("ui/resize"); // Publish event for grid etc.
+                   // Update Perfect Scrollbar after resize calculation is done
+                  if (window.Ps && editorContainer) {
+                       try { Ps.update(editorContainer); } catch(err){}
+                  }
+             }, delay);
+        };
+
+
+    } else {
+        console.warn("Resizer elements not found, resizing disabled.");
+    }
+
     /////////////////////////
     ///// PLAY CONTROLS /////
     /////////////////////////
@@ -514,4 +600,18 @@
         },
         false
     );
+
+	let windowResizeTimeout;
+     window.addEventListener("resize", function(){
+         clearTimeout(windowResizeTimeout);
+         windowResizeTimeout = setTimeout(() => {
+             publish("ui/resize"); // Grid and other components listen to this
+
+             // Explicitly update scrollbar on window resize too
+             if (window.Ps && editorContainer) {
+                  try { Ps.update(editorContainer); } catch(err) {}
+             }
+             console.log("Window resized, updated UI.");
+         }, 150);
+     }, false);
 })(window); // End of UI module IIFE
