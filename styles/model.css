@@ -261,6 +261,7 @@ THE EDITOR
 	display: flex;
 	/* Use flex for alignment */
 	align-items: center;
+	gap: 5px;
 }
 
 #editor input.editor_icon {
@@ -793,6 +794,45 @@ THE EDITOR
 	/* Add space after delete button area */
 	flex-grow: 1;
 	/* Allow action content to take space */
+}
+
+.editor_icon_button {
+	font-size: 28px;
+	/* Adjust size as needed */
+	font-family: 'OpenSansEmoji', Helvetica, Arial, sans-serif;
+	/* Ensure emoji font */
+	width: 44px;
+	height: 44px;
+	background: #e8def8;
+	/* M3 Primary Container */
+	border: 1px solid #cac4d0;
+	border-radius: 8px;
+	/* Rounded */
+	margin-right: 10px;
+	flex-shrink: 0;
+	display: inline-flex;
+	/* Align content center */
+	justify-content: center;
+	align-items: center;
+	padding: 0;
+	cursor: pointer;
+	transition: background-color 0.2s;
+	line-height: 1;
+	/* Prevent extra line height issues */
+	text-align: center;
+	vertical-align: middle;
+	/* Align with name input */
+}
+
+.editor_icon_button:hover {
+	background: #d8cde0;
+	/* Darker hover */
+}
+
+.editor_icon_button:focus {
+	outline: 2px solid #6750a4;
+	/* Focus outline */
+	outline-offset: 1px;
 }
 
 /***************
