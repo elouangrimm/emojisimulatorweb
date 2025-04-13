@@ -128,9 +128,8 @@ as well as serialize & deserialize.
     console.log("Model.js: Model.returnToBackup function defined.");
 
 
-    // Load NEW model data (from localStorage, Import, LZString)
-    // This REPLACES the current Model.data and rebuilds UI/Grid.
-    console.log("Model.js: Model.loadModelData called.");
+    Model.loadModelData = function (newData) { // <<<<< START Function definition assignment
+        console.log("Model.js: Model.loadModelData called.");
         try {
             // --- Basic validation and data preparation ---
             if (!newData || !newData.meta || !newData.states || !newData.world) {
@@ -159,30 +158,19 @@ as well as serialize & deserialize.
 
 
             // *** Trigger UI rebuilds via events AFTER data is loaded ***
-
-            // 1. Trigger Editor rebuild (Editor.js listens)
-            publish("/model/load/success"); // << NEW EVENT
-
-            // 2. Trigger Grid display update (Grid.js listens)
-            publish("/grid/updateAgents"); // Show the initial state of the loaded model
-
-            // 3. Reset unsaved flag
-            window.hasUnsavedChanges = false;
-
-            // 4. Publish general init event (for Playback controls, etc. in UI.js)
-            //    This MUST happen AFTER model state (like isPlaying) is set.
-            publish("/model/init");
+            publish("/model/load/success"); // Editor listens
+            publish("/grid/updateAgents"); // Grid listens
+            window.hasUnsavedChanges = false; // Reset flag
+            publish("/model/init"); // UI playback controls listen
 
             console.log("Model.js: Model loaded successfully via loadModelData. Events published.");
-
-            // 5. Update URL (after everything else)
-            Save.updateURL();
+            Save.updateURL(); // Update URL
 
         } catch (error) {
             console.error("Model.js: Failed inside loadModelData:", error);
             alert("Error processing simulation data. It might be invalid or corrupted.\n\n" + error.message);
         }
-    }
+    };
     console.log("Model.js: Model.loadModelData function defined. Type:", typeof Model.loadModelData);
 
 

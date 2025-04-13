@@ -56,7 +56,10 @@
         Editor.titleInput = document.createElement("input");
         // ... (title input setup - reads from Model.data) ...
         Editor.dom.appendChild(Editor.titleInput);
-         Editor.updateTitleUI = () => { /* ... keep existing implementation ... */ };
+         Editor.updateTitleUI = () => { 
+			if (Editor.titleInput) Editor.titleInput.value = Model.data.meta.title || "Untitled Emoji Simulation";
+ 			 document.title = (Model.data.meta.title || "Untitled Emoji Simulation") + " - Emoji Simulator! 😘";
+		  };
          // Call it once during creation to set initial value
          Editor.updateTitleUI();
 
