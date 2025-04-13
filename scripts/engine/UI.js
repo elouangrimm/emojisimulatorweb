@@ -351,7 +351,6 @@
             ); // Find by ID
 
             // Calculate next index, ensuring it loops correctly
-            let nextIndex = 0; // Default to first state
             if (stateIndex !== -1) {
                 // If current state was found
                 nextIndex = (stateIndex + 1) % Model.data.states.length;
