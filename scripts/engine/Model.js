@@ -9,373 +9,340 @@ as well as serialize & deserialize.
 
 ***********************/
 
-(function (exports) {
-    // Singleton
-    window.Model = {};
+(function(exports){
+    console.log("Model.js: Starting IIFE execution."); // Log Start
 
-    // Data
-    Model.data = {};
-    Model.backup = null;
+	// Singleton
+	window.Model = {}; // Define Model on the window object
+    console.log("Model.js: window.Model object created.");
+
+	// Data
+	Model.data = {};
+	Model.backup = null;
     window.hasUnsavedChanges = false; // Flag for unsaved changes prompt
+    console.log("Model.js: Initial variables defined.");
 
-    // Init (Called once on initial page load by Load.js)
-    // Note: This function is NOT called when loading from localStorage or Import,
-    // Model.loadModelData handles those cases.
-    Model.init = function (data) {
-        console.log("Model.js: Initializing model..."); // Log init
+	// Init (Called once on initial page load by Load.js AFTER data is fetched)
+    // This sets up the simulation based on the initially loaded data.
+	Model.init = function(data){
+        console.log("Model.js: Initializing model (Model.init)...");
 
-        // Save data (and backup for a reset)
-        Model.data = data;
+		// Save data (and backup for a reset)
+		Model.data = data;
 
-        // --- Clean up loaded data ---
+		// --- Clean up initially loaded data ---
         Model.data.meta = Model.data.meta || {};
-        Model.data.meta.title =
-            Model.data.meta.title || "Untitled Emoji Simulation";
+        Model.data.meta.title = Model.data.meta.title || "Untitled Emoji Simulation";
         if (Model.data.meta.description) {
-            // Remove old description if present
+            console.log("Model.init: Removing legacy 'description'.");
             delete Model.data.meta.description;
         }
-        // Ensure actions arrays exist recursively (good practice)
         const ensureActions = (items) => {
-            if (!items || !Array.isArray(items)) return;
-            items.forEach((item) => {
-                if (item && typeof item === "object") {
-                    item.actions = item.actions || [];
-                    ensureActions(item.actions); // Recurse
-                }
-            });
-        };
-        ensureActions(Model.data.states);
-        // --- End data cleanup ---
+             if (!items || !Array.isArray(items)) return;
+             items.forEach(item => {
+                 if (item && typeof item === 'object') {
+                     item.actions = item.actions || [];
+                     ensureActions(item.actions);
+                 }
+             });
+         };
+         ensureActions(Model.data.states);
+         // --- End data cleanup ---
 
         // Create backup *after* cleanup
-        Model.backup = JSON.parse(JSON.stringify(Model.data));
+		Model.backup = JSON.parse(JSON.stringify(Model.data));
+        console.log("Model.init: Backup created.");
 
         // Update tab title
         document.title = Model.data.meta.title + " - Emoji Simulator! 😘";
 
-        // Initialize Grid (creates agents based on Model.data.world)
-        Grid.initialize();
+		// Initialize Grid
+		Grid.initialize();
 
-        // Initialize Editor UI (reads from Model.data)
-        if (UI.options.edit !== UI.NONE) {
-            // Clear editor first in case of race conditions/reloads
-            if (Editor.dom) Editor.dom.innerHTML = "";
-            Editor.create(); // Let Editor.create handle reading Model.data
+		// Initialize Editor UI (only if enabled)
+		if(UI.options.edit !== UI.NONE) {
+            if(Editor.dom) Editor.dom.innerHTML = ''; // Clear first
+            Editor.create(); // Rebuild editor
+             if(Editor.updateTitleUI) Editor.updateTitleUI(); // Ensure title input reflects model
+		} else {
+             if(Editor.updateTitleUI) Editor.updateTitleUI(); // Update title display even if editor hidden
         }
 
-        // Set initial playback state
-        Model.isPlaying = UI.options.paused == UI.NONE; // Use strict equality
+		// Set initial playback state
+		Model.isPlaying = (UI.options.paused == UI.NONE);
+        console.log("Model.init: isPlaying set to:", Model.isPlaying);
 
-        // Update grid visuals
-        publish("/grid/updateSize"); // Resize grid visuals
-        publish("/grid/updateAgents"); // Draw initial agent states
+		// Update grid visuals
+		publish("/grid/updateSize");
+		publish("/grid/updateAgents");
 
-        // Start animation loop
-        _lastTimestamp = null; // Reset timestamp for animation loop
+		// Start animation loop
+		_lastTimestamp = null; // Reset timestamp for animation loop
         _ticker = 0;
-        requestAnimationFrame(Model.tick);
+		requestAnimationFrame(Model.tick);
 
         window.hasUnsavedChanges = false; // Reset flag after initial load
 
-        // Publish initialization complete event (UI elements listen to this)
-        publish("/model/init");
-        console.log("Model.js: Initialization complete.");
-    };
+		// Publish initialization complete event
+		publish("/model/init"); // UI elements listen to this
+        console.log("Model.js: Initialization complete (Model.init finished).");
+	};
+     console.log("Model.js: Model.init function defined.");
 
-    // Return to backup state (triggered by Reset button)
-    Model.returnToBackup = function () {
+
+	// Return to backup state (triggered by Reset button)
+	Model.returnToBackup = function(){
         console.log("Model.js: Returning to backup...");
 
-        // Restore data from backup
-        Model.data = JSON.parse(JSON.stringify(Model.backup));
+		// Restore data from backup
+		Model.data = JSON.parse(JSON.stringify(Model.backup));
 
-        // Reinitialize Grid with restored data
-        Grid.reinitialize(); // This also calls Grid.initialize internally
+		// Reinitialize Grid with restored data
+		Grid.reinitialize();
 
         // Rebuild Editor UI from scratch using restored Model.data
-        if (UI.options.edit !== UI.NONE && Editor.dom) {
-            // Clear existing editor content safely
+		if(UI.options.edit !== UI.NONE && Editor.dom) {
             while (Editor.dom.firstChild) {
                 Editor.dom.removeChild(Editor.dom.firstChild);
             }
-            Editor.create(); // Recreate the editor fully
-            // Ensure title UI is updated after recreation
+            Editor.create();
             if (Editor.updateTitleUI) Editor.updateTitleUI();
-        } else {
-            // Update title even if editor is hidden
+		} else {
             if (Editor.updateTitleUI) Editor.updateTitleUI();
         }
 
         // Update tab title
-        document.title =
-            (Model.data.meta.title || "Untitled Emoji Simulation") +
-            " - Emoji Simulator! 😘";
+         document.title = (Model.data.meta.title || "Untitled Emoji Simulation") + " - Emoji Simulator! 😘";
 
-        // Update grid visuals
-        publish("/grid/updateAgents"); // Show the restored state
+         // Update grid visuals
+         publish("/grid/updateAgents");
 
-        window.hasUnsavedChanges = false; // Reset unsaved flag
+         window.hasUnsavedChanges = false; // Reset unsaved flag
 
-        // Publish message that reset is done (e.g., for scrollbar reset)
-        publish("/meta/reset/complete");
+		// Publish message that reset is done
+		publish("/meta/reset/complete");
         console.log("Model.js: Backup restored.");
-        Save.updateURL(); // Update URL to reflect the restored state
-    };
+         Save.updateURL(); // Update URL
 
-    // Load new model data (from localStorage, Import, or potentially LZString in future)
-    // This function REPLACES the current Model.data and rebuilds UI.
+	};
+    console.log("Model.js: Model.returnToBackup function defined.");
+
+
+    // Load NEW model data (from localStorage, Import, LZString)
+    // This REPLACES the current Model.data and rebuilds UI/Grid.
     Model.loadModelData = function (newData) {
         console.log("Model.js: Model.loadModelData called.");
         try {
             // Basic validation
-            if (
-                !newData ||
-                !newData.meta ||
-                !newData.states ||
-                !newData.world
-            ) {
+            if (!newData || !newData.meta || !newData.states || !newData.world) {
                 throw new Error("Invalid simulation data structure.");
             }
 
             // Ensure actions arrays exist recursively
             const ensureActions = (items) => {
                 if (!items || !Array.isArray(items)) return;
-                items.forEach((item) => {
-                    if (item && typeof item === "object") {
+                items.forEach(item => {
+                    if (item && typeof item === 'object') {
                         item.actions = item.actions || [];
-                        ensureActions(item.actions); // Recurse
+                        ensureActions(item.actions);
                     }
                 });
             };
             ensureActions(newData.states);
 
             // Add title if missing, remove description
-            newData.meta.title =
-                newData.meta.title || "Untitled Emoji Simulation";
+            newData.meta.title = newData.meta.title || "Untitled Emoji Simulation";
             if (newData.meta.description) {
+                 console.log("Model.loadModelData: Removing legacy 'description'.");
                 delete newData.meta.description;
             }
+            // --- REMOVED GRID LOADING LOGIC AS PER USER REQUEST ---
+            // if (newData.gridState) {
+            //    console.log("Model.loadModelData: Saved grid state found.");
+            //    // Grid.initialize will handle using this if it exists
+            // }
 
             // *** Replace current data ***
             Model.data = newData;
             Model.backup = JSON.parse(JSON.stringify(Model.data)); // Update backup too
+            console.log("Model.loadModelData: Model.data replaced.");
 
             // Re-initialize Grid with new data
-            Grid.reinitialize();
+            Grid.reinitialize(); // Calls Grid.initialize which now checks Model.data
 
-            // Rebuild Editor UI from scratch using new Model.data
+            // Rebuild Editor UI
             if (UI.options.edit !== UI.NONE && Editor.dom) {
                 while (Editor.dom.firstChild) {
                     Editor.dom.removeChild(Editor.dom.firstChild);
                 }
                 Editor.create();
                 if (Editor.updateTitleUI) Editor.updateTitleUI();
+                 console.log("Model.loadModelData: Editor rebuilt.");
             } else {
-                if (Editor.updateTitleUI) Editor.updateTitleUI(); // Update title even if editor hidden
+                 if (Editor.updateTitleUI) Editor.updateTitleUI();
             }
 
             // Update tab title
-            document.title =
-                (Model.data.meta.title || "Untitled Emoji Simulation") +
-                " - Emoji Simulator! 😘";
+            document.title = (Model.data.meta.title || "Untitled Emoji Simulation") + " - Emoji Simulator! 😘";
 
-            // Reset playback state based on loaded meta, or default
-            Model.isPlaying =
-                newData.meta.play !== undefined ? newData.meta.play : true;
-            UI.options.paused = !Model.isPlaying; // Sync UI option
+            // Reset playback state based on loaded meta
+            Model.isPlaying = newData.meta.play !== undefined ? newData.meta.play : true;
+            UI.options.paused = !Model.isPlaying;
 
             // Update grid display
-            publish("/grid/updateAgents"); // Show the initial state of the loaded model
+            publish("/grid/updateAgents");
 
-            window.hasUnsavedChanges = false; // Reset unsaved flag after successful load
+            window.hasUnsavedChanges = false; // Reset unsaved flag
 
             // Publish event AFTER everything is rebuilt/reset
-            publish("/model/init"); // Notify UI elements (like playback controls) to update
+            publish("/model/init"); // Notify UI controls (like playback)
+            console.log("Model.js: Model loaded successfully via loadModelData.");
 
-            console.log(
-                "Model.js: Model loaded successfully via loadModelData."
-            );
-            Save.updateURL(); // Update URL to reflect the newly loaded state
+            // Update URL only AFTER successful load
+             Save.updateURL();
+
         } catch (error) {
-            console.error(
-                "Model.js: Failed to load model data inside loadModelData:",
-                error
-            );
-            alert(
-                "Error loading simulation data. It might be invalid or corrupted.\n\n" +
-                    error.message
-            );
-            // Optionally, revert to a safe state here, e.g.,
-            // Model.returnToBackup(); // Or load a default model
+            console.error("Model.js: Failed inside loadModelData:", error);
+            alert("Error processing simulation data. It might be invalid or corrupted.\n\n" + error.message);
         }
     };
+    console.log("Model.js: Model.loadModelData function defined. Type:", typeof Model.loadModelData);
 
-    // --- Playback Control ---
-    Model.isPlaying = true;
-    Model.play = function () {
+
+	// --- Playback Control ---
+	Model.isPlaying = true;
+	Model.play = function(){
         if (!Model.isPlaying) {
+            console.log("Model: Play triggered.");
             Model.isPlaying = true;
-            _lastTimestamp = null; // Reset timestamp to avoid large jump after pause
-            publish("/play/start"); // Notify UI
-            console.log("Model: Play");
+            _lastTimestamp = null; // Reset timestamp to avoid jump
+            publish("/play/start");
         }
-    };
-    Model.pause = function () {
+	};
+	Model.pause = function(){
         if (Model.isPlaying) {
+            console.log("Model: Pause triggered.");
             Model.isPlaying = false;
-            publish("/play/pause"); // Notify UI
-            console.log("Model: Pause");
+            publish("/play/pause");
         }
-    };
+	};
+     console.log("Model.js: Play/Pause functions defined.");
+
 
     // --- Animation Loop ---
-    let _lastTimestamp = null; // Use let
-    let _ticker = 0; // Use let
-    Model.tick = function (timestamp) {
-        // RAF
-        requestAnimationFrame(Model.tick);
+	let _lastTimestamp = null;
+	let _ticker = 0;
+	Model.tick = function(timestamp){
+		requestAnimationFrame(Model.tick);
+        if (!Model.data || !Model.data.meta) return;
 
-        // Ensure model data exists before proceeding
-        if (!Model.data || !Model.data.meta) {
-            // console.warn("Model.tick: Model data not ready.");
-            return;
+		if(!_lastTimestamp) {
+            _lastTimestamp = timestamp;
+             _ticker = 0; // Reset ticker on first frame/resume
+             return; // Skip first frame after init/resume
         }
+		const delta = timestamp - _lastTimestamp;
+		_lastTimestamp = timestamp;
 
-        // Calculate delta time
-        if (!_lastTimestamp) {
-            // console.log("Tick: Initializing timestamp or resuming play."); // Log init/resume
-            _lastTimestamp = timestamp; // Initialize timestamp
-            _ticker = 0; // Reset ticker on resume too
-            return; // Skip first frame after resume/init to establish baseline
-        }
-        const delta = timestamp - _lastTimestamp;
-        // If delta is abnormally large (e.g., tab was inactive), cap it to prevent huge jumps
-        const maxDelta = 500; // Max delta in ms (e.g., 0.5 seconds)
-        _ticker += Math.min(delta, maxDelta);
-        _lastTimestamp = timestamp;
+		if(!Model.isPlaying) return; // Check pause *after* updating timestamp
 
-        // If paused, do nothing more
-        if (!Model.isPlaying) return;
-
-        const maxDelta = 500; // Max delta in ms
+        const maxDelta = 500;
         const cappedDelta = Math.min(delta, maxDelta);
-        if (delta > maxDelta) {
-            console.warn(
-                `Tick: Delta capped from ${delta.toFixed(1)}ms to ${maxDelta}ms`
-            );
-        }
-        _ticker += cappedDelta; // Use capped delta
+		_ticker += cappedDelta;
 
-        // Determine steps based on FPS
         const fps = Model.data.meta.fps || 30;
-        const tickerLimit = 1000 / fps;
-        // console.log(`Tick: delta=${delta.toFixed(1)}, ticker=${_ticker.toFixed(1)}, limit=${tickerLimit.toFixed(1)}`); // Verbose log
+		const tickerLimit = 1000 / fps;
+		if(_ticker < tickerLimit) return;
 
-        if (_ticker < tickerLimit) return; // Not enough time passed
-
-        // Calculate steps missed (with a cap)
-        let steps = 0;
-        while (_ticker >= tickerLimit) {
-            steps++;
-            _ticker -= tickerLimit;
-        }
-        const maxSteps = 5;
-        if (steps > maxSteps) {
-            console.warn(
-                `Tick: Lag detected, tried ${steps} steps. Capping at ${maxSteps}.`
-            );
+		let steps = 0;
+		while(_ticker >= tickerLimit){
+			steps++;
+			_ticker -= tickerLimit;
+		}
+		const maxSteps = 5;
+		if(steps > maxSteps) {
+            console.warn(`Tick Lag: ${steps} steps capped to ${maxSteps}`);
             steps = maxSteps;
-            _ticker = 0; // Reset ticker if lagging badly
+            _ticker = 0;
         }
 
-        // Perform steps
-        for (let i = 0; i < steps; i++) {
-            Grid.step();
-        }
+		for(let i = 0; i < steps; i++){
+			Grid.step();
+		}
 
-        // Update screen after steps
-        publish("/grid/updateAgents");
-    };
+		publish("/grid/updateAgents");
+	};
+    console.log("Model.js: Tick function defined.");
 
-    // --- Helper Functions ---
-    Model.getStateByID = function (id) {
+
+	// --- Helper Functions ---
+	Model.getStateByID = function(id){
         if (!Model.data || !Model.data.states) return null;
-        // Handle potential type mismatch (ID from DOM might be string)
         const numericId = Number(id);
-        for (let i = 0; i < Model.data.states.length; i++) {
-            const state = Model.data.states[i];
-            if (state.id === numericId) return state; // Use strict equality if IDs are numbers
-        }
-        return null;
-    };
+		for(let i=0; i<Model.data.states.length; i++){
+			const state = Model.data.states[i];
+			if(state.id === numericId) return state;
+		}
+		return null;
+	};
 
-    Model.removeStateByID = function (id) {
+	Model.removeStateByID = function(id){
         if (!Model.data || !Model.data.states) return;
         const numericId = Number(id);
-        for (let i = 0; i < Model.data.states.length; i++) {
-            const state = Model.data.states[i];
-            if (state.id === numericId) {
-                // Check if this state is used as the draw brush
+		for(let i=0; i<Model.data.states.length; i++){
+			const state = Model.data.states[i];
+			if(state.id === numericId){
                 if (Model.data.meta && Model.data.meta.draw == numericId) {
-                    Model.data.meta.draw = 0; // Reset draw brush to default
-                    publish("/ui/updateStateHeaders"); // Trigger brush update
+                    Model.data.meta.draw = 0;
+                    publish("/ui/updateStateHeaders");
                 }
-                Model.data.states.splice(i, 1);
-                window.hasUnsavedChanges = true; // Mark change
-                Save.updateURL(); // Update URL after structural change
-                return; // Exit after removing
-            }
-        }
-    };
+				Model.data.states.splice(i,1);
+                window.hasUnsavedChanges = true;
+                Save.updateURL();
+				return;
+			}
+		}
+	};
 
-    Model.generateNewID = function () {
-        if (!Model.data || !Model.data.states) return 0; // Fallback
-        let highestID = -1;
-        Model.data.states.forEach((state) => {
-            if (highestID < state.id) {
-                highestID = state.id;
-            }
+	Model.generateNewID = function(){
+        if (!Model.data || !Model.data.states) return 0;
+		let highestID = -1;
+		Model.data.states.forEach(state => {
+            if(highestID < state.id){
+				highestID = state.id;
+			}
         });
-        return highestID + 1;
-    };
+		return highestID + 1;
+	};
+    console.log("Model.js: Helper functions defined.");
 
-    // --- Emoji Generation ---
-    let emojiIndex = -1; // Use let
-    const emojis = [
-        // Use const
-        { icon: "😺" },
-        { icon: "🌸" },
-        { icon: "🍇" },
-        { icon: "🎱" },
-        { icon: "🐚" },
-        { icon: "🌲" },
-        { icon: "🔥" },
-        { icon: "💀" },
-        { icon: "🌊" },
-        { icon: "🏖" },
-        { icon: "🌍" },
-        { icon: "⭐" },
-        { icon: "🚀" },
-        { icon: "👾" },
-        { icon: "🤖" },
-    ];
-    Model.generateNewEmoji = function () {
-        emojiIndex = (emojiIndex + 1) % emojis.length;
-        return { ...emojis[emojiIndex] }; // Return a copy
-    };
+
+	// --- Emoji Generation ---
+	let emojiIndex = -1;
+	const emojis = [
+		{ icon: "😺" }, { icon: "🌸" }, { icon: "🍇" }, { icon: "🎱" }, { icon: "🐚" },
+        { icon: "🌲" }, { icon: "🔥" }, { icon: "💀" }, { icon: "🌊" }, { icon: "🏖" },
+        { icon: "🌍" }, { icon: "⭐" }, { icon: "🚀" }, { icon: "👾" }, { icon: "🤖" }
+	];
+	Model.generateNewEmoji = function(){
+		emojiIndex = (emojiIndex + 1) % emojis.length;
+		return { ...emojis[emojiIndex] };
+	};
+    console.log("Model.js: Emoji generator defined.");
+
+    console.log("Model.js: End of IIFE execution.");
 })(window); // End of Model IIFE
 
+
 // --- Global Event Listener for Unsaved Changes ---
-// This should be outside the IIFE to attach to the global window object
-window.addEventListener("beforeunload", (event) => {
-    if (window.hasUnsavedChanges) {
-        // Standard way to trigger the browser's confirmation dialog.
-        event.preventDefault();
-        // Chrome requires returnValue to be set.
-        event.returnValue = "";
-        // Return the confirmation message string (though most modern browsers ignore it)
-        return "You have unsaved changes. Are you sure you want to leave?";
-    }
-    // If no unsaved changes, the browser will close without prompt (return undefined).
+window.addEventListener('beforeunload', (event) => {
+  if (window.hasUnsavedChanges) {
+    event.preventDefault();
+    event.returnValue = ''; // Required for Chrome
+    return 'You have unsaved changes. Are you sure you want to leave?'; // Standard message
+  }
 });
+console.log("Model.js: 'beforeunload' listener attached.");
+
+// Final check after script runs
+console.log("Model.js: Script execution finished. window.Model type:", typeof window.Model);
