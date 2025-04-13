@@ -1018,8 +1018,6 @@ THE PLAY CONTROLS
 	/* Explicitly opaque */
 	visibility: visible !important;
 	overflow: visible;
-	border: 1px dotted red;
-	/* TEMPORARY: Add border to see container */
 }
 
 #play_controls>.control_speed>input[type=range] {
@@ -1039,7 +1037,6 @@ THE PLAY CONTROLS
 	/* Explicitly visible */
 	opacity: 1;
 	/* Explicitly opaque */
-	border: 1px dotted blue;
 }
 
 /* Thumb styles should already be defined - check them */

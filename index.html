@@ -57,7 +57,9 @@
         <div id="play_container">
             <div id="play_controls">
                 <!-- New Board -->
-                <div class="control_button" id="play_reset"><span class="material-symbols-outlined">refresh</span></div>
+                <div class="control_button" id="play_reset">
+                    <span class="material-symbols-outlined">refresh</span>
+                </div>
                 <div class="control_divider"></div>
 
                 <div
@@ -68,6 +70,19 @@
                     <span class="material-symbols-outlined">pause</span>
                 </div>
                 <div class="control_speed">
+                    <input
+                        id="control_fps"
+                        type="range"
+                        min="1"
+                        max="60"
+                        step="1"
+                        title="Simulation Speed"
+                    />
+                    <div class="speed_labels">
+                        <div>slow</div>
+                        <!-- Keep simple divs for labels -->
+                        <div>fast</div>
+                    </div>
                 </div>
                 <div
                     class="control_button"
@@ -103,16 +118,10 @@
 <!-- Engine -->
 <script src="scripts/engine/Actions.js"></script>
 <script src="scripts/engine/Agent.js"></script>
+<script src="scripts/engine/Model.js"></script>
 <script src="scripts/engine/Grid.js"></script>
-<!--script src="scripts/engine/Graph.js"></script-->
+<script src="scripts/engine/Save.js"></script>
 <script src="scripts/engine/UI.js"></script>
 <script src="scripts/engine/Editor.js"></script>
-<script src="scripts/engine/Model.js"></script>
 <script src="scripts/engine/Scroll.js"></script>
-<script src="scripts/engine/Save.js"></script>
 <script src="scripts/engine/Load.js"></script>
-
-<!-- Emoji Test -->
-<script src="scripts/emoji/platform.js"></script>
-<script src="scripts/emoji/emojiTest.js"></script>
-<script src="scripts/libraries/emojiFallback.js"></script>
