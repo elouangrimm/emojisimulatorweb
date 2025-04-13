@@ -243,7 +243,12 @@ as well as serialize & deserialize.
         }
 
         // Calculate delta time
-        if (!_lastTimestamp) _lastTimestamp = timestamp; // Initialize timestamp on first frame or after play
+        if (!_lastTimestamp) {
+            // console.log("Tick: Initializing timestamp or resuming play."); // Log init/resume
+            _lastTimestamp = timestamp; // Initialize timestamp
+            _ticker = 0; // Reset ticker on resume too
+            return; // Skip first frame after resume/init to establish baseline
+        }
         const delta = timestamp - _lastTimestamp;
         // If delta is abnormally large (e.g., tab was inactive), cap it to prevent huge jumps
         const maxDelta = 500; // Max delta in ms (e.g., 0.5 seconds)
@@ -253,10 +258,21 @@ as well as serialize & deserialize.
         // If paused, do nothing more
         if (!Model.isPlaying) return;
 
+        const maxDelta = 500; // Max delta in ms
+        const cappedDelta = Math.min(delta, maxDelta);
+        if (delta > maxDelta) {
+            console.warn(
+                `Tick: Delta capped from ${delta.toFixed(1)}ms to ${maxDelta}ms`
+            );
+        }
+        _ticker += cappedDelta; // Use capped delta
+
         // Determine steps based on FPS
-        const fps = Model.data.meta.fps || 30; // Use default if not set
+        const fps = Model.data.meta.fps || 30;
         const tickerLimit = 1000 / fps;
-        if (_ticker < tickerLimit) return; // Not enough time passed for a step
+        // console.log(`Tick: delta=${delta.toFixed(1)}, ticker=${_ticker.toFixed(1)}, limit=${tickerLimit.toFixed(1)}`); // Verbose log
+
+        if (_ticker < tickerLimit) return; // Not enough time passed
 
         // Calculate steps missed (with a cap)
         let steps = 0;
@@ -264,13 +280,13 @@ as well as serialize & deserialize.
             steps++;
             _ticker -= tickerLimit;
         }
-        if (steps > 5) {
-            // Increase cap slightly?
+        const maxSteps = 5;
+        if (steps > maxSteps) {
             console.warn(
-                `Simulation lagging: Tried to perform ${steps} steps. Capping at 5.`
+                `Tick: Lag detected, tried ${steps} steps. Capping at ${maxSteps}.`
             );
-            steps = 5;
-            _ticker = 0; // Reset ticker if lagging significantly
+            steps = maxSteps;
+            _ticker = 0; // Reset ticker if lagging badly
         }
 
         // Perform steps

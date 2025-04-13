@@ -56,7 +56,7 @@
         path = url;
     } else {
         console.log("Loading default model: forest.json");
-        path = "models/forest.json";
+        path = "models/blank.json";
     }
 
     let onLoadSuccess = (model) => {
@@ -94,7 +94,7 @@
             `Error loading simulation from ${path}. Please check the source or try the default.\n\nLoading default simulation...`
         );
         // Attempt to load default as fallback
-        path = "models/forest.json"; // Ensure path is default
+        path = "models/blank.json"; // Ensure path is default
         simDataSource = null; // Clear any potentially bad direct source
         loadFromPath(); // Try again with default path
     };
