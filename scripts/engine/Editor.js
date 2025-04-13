@@ -62,56 +62,6 @@
         Editor.dom.appendChild(Editor.statesDOM);
         Editor.createStatesUI(Editor.statesDOM, Model.data.states);
 
-        if (typeof EmojiPicker === "function") {
-            // Check if picker loaded
-            new EmojiPicker({
-                trigger: [
-                    {
-                        selector: ".editor_icon_button", // Target our buttons
-                        // insertInto is handled by our custom onSelect now
-                    },
-                ],
-                closeButton: true,
-                closeOnSelect: true, // Close picker after selection
-                // Custom callback when an emoji is selected
-                onSelect: function (emoji, triggerElement) {
-                    // console.log("Emoji Selected:", emoji, "Trigger:", triggerElement);
-                    if (!triggerElement) return;
-
-                    const stateId = triggerElement.dataset.stateId; // Get state ID from button
-                    if (stateId === undefined || stateId === null) return;
-
-                    const stateConfig = Model.getStateByID(stateId); // Find the state config
-                    if (stateConfig) {
-                        // Update model
-                        stateConfig.icon = emoji;
-                        // Update button display
-                        triggerElement.innerHTML = emoji;
-                        // Trigger updates
-                        publish("/ui/updateStateHeaders");
-                        window.hasUnsavedChanges = true;
-                        Save.updateURL();
-                    } else {
-                        console.warn(
-                            `Could not find state config for ID: ${stateId}`
-                        );
-                    }
-                },
-            });
-
-            // --- Add listener to track the clicked button ---
-            // Use delegation on the editor container
-            Editor.dom.addEventListener("click", function (event) {
-                const button = event.target.closest(".editor_icon_button");
-                if (button) {
-                    lastClickedEmojiButton = button; // Store reference to the clicked button
-                    // console.log("Emoji button clicked, storing reference:", lastClickedEmojiButton);
-                }
-            });
-        } else {
-            console.error("EmojiPicker library not found!");
-        }
-
         // Button - Add a state!
         const addStateButton = Editor.createFancyButton(
             "<span class='button-icon'>+</span> New Thing",
@@ -494,25 +444,60 @@
         stateHeader.className = "editor_state_header";
         dom.appendChild(stateHeader);
 
-        // --- Create BUTTON instead of INPUT ---
-        const iconButton = document.createElement("button"); // Use button semantically
-        iconButton.className = "editor_icon_button"; // Use this class as selector
-        iconButton.innerHTML = stateConfig.icon || " "; // Display current icon
-        iconButton.dataset.stateId = stateConfig.id; // Store ID for lookup
-        iconButton.title = "Click to change emoji";
-        stateHeader.appendChild(iconButton);
-        // --- End Button ---
+        const icon = document.createElement("input");
+        icon.className = "editor_icon";
+        icon.type = "text";
+        icon.value = stateConfig.icon;
+        icon.maxLength = 2; // Limit icon length
+        icon.oninput = function () {
+            stateConfig.icon = icon.value;
+            publish("/ui/updateStateHeaders");
+            window.hasUnsavedChanges = true;
+            Save.updateURL();
+        };
+        icon.onclick = () => icon.select();
+        stateHeader.appendChild(icon);
 
         // Name Input (keep as is)
         const name = document.createElement("input");
         name.className = "editor_name";
-        // ... (rest of name input setup) ...
+        name.type = "text";
+        name.value = stateConfig.name;
+        name.oninput = function () {
+            stateConfig.name = name.value;
+            publish("/ui/updateStateHeaders");
+            window.hasUnsavedChanges = true;
+            Save.updateURL();
+        };
+        name.onchange = Save.updateURL;
         stateHeader.appendChild(name);
 
         // Delete Button (keep as is)
         if (stateConfig.id != 0) {
             const deleteDOM = document.createElement("div");
-            // ... (rest of delete button setup) ...
+            deleteDOM.className = "delete_state";
+            deleteDOM.innerHTML = "⊗";
+            deleteDOM.title = "Delete this state";
+            // Use closure to capture correct stateConfig and dom element
+            (function (currentConfig, currentDOM) {
+                deleteDOM.onclick = function () {
+                    if (
+                        confirm(
+                            `Are you sure you want to delete the state "${currentConfig.name}"?`
+                        )
+                    ) {
+                        Model.removeStateByID(currentConfig.id); // Splice away (already marks unsaved & updates URL)
+                        publish("/ui/removeState", [currentConfig.id]); // remove state
+                        publish("/ui/updateStateHeaders"); // update state headers
+                        if (
+                            Editor.statesDOM &&
+                            currentDOM.parentNode === Editor.statesDOM
+                        ) {
+                            Editor.statesDOM.removeChild(currentDOM); // and, remove this DOM child
+                        }
+                    }
+                };
+            })(stateConfig, dom);
             stateHeader.appendChild(deleteDOM);
         }
 
