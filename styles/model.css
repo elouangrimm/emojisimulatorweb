@@ -248,12 +248,12 @@ body.is-resizing #editor_resizer {
 }
 
 #editor .editor_state {
-	margin-bottom: 12px;
+	margin-bottom: 20px;
 	background-color: #fffbfe;
 
 	border-radius: 12px;
 
-	padding: 8px 12px;
+	padding: 10px 15px;
 	border: 1px solid #cac4d0;
 
 	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -348,24 +348,26 @@ body.is-resizing #editor_resizer {
 }
 
 #editor input[type=text].editor_number {
-	/* Keep simple dotted underline style */
 	font-size: inherit;
-	width: 40px;
+	width: 45px;
+
 	cursor: col-resize;
 	border: none;
 	border-bottom: 1px dotted #aaa;
+
 	border-radius: 0;
 	background: none;
 	text-align: center;
-	padding: 0;
-	margin: 0 2px;
+	padding: 1px 0;
+	margin: 0 4px;
+
 	vertical-align: baseline;
 	display: inline;
-	/* Ensure inline */
 }
 
 #editor input[type=text].editor_number:focus {
-	border-bottom: 1px solid #555;
+	border-bottom: 1px solid #6750a4;
+
 	outline: none;
 }
 
@@ -379,46 +381,35 @@ body.is-resizing #editor_resizer {
 }
 
 #editor .editor_actions li {
-	padding: 1px 0 1px 10px;
+	padding: 2px 0 2px 10px;
 
 	margin-bottom: 3px;
+
+	display: block;
 
 	line-height: 1.5;
 
 	position: relative;
 
-	min-height: 20px;
+	min-height: 22px;
 }
 
 #editor .editor_actions li>span,
 #editor .editor_actions li>select,
-#editor .editor_actions li>input.editor_number,
-#editor .editor_actions li>.editor_state_selector_container,
-#editor .editor_actions li>.action-ui-container {
-	display: inline !important;
-	/* USE INLINE! */
-	vertical-align: baseline !important;
-	/* Align text baselines */
-	margin: 0 3px 0 0 !important;
-	/* Minimal right margin */
-	padding: 0 !important;
-	/* No extra padding */
-	font-size: inherit !important;
-	/* Match LI font size */
-	width: auto !important;
-	height: auto !important;
-	float: none !important;
-	flex-grow: 0 !important;
-	flex-shrink: 0 !important;
-	box-shadow: none !important;
-}
+#editor .editor_actions li>input[type=text].editor_number,
+#editor .editor_actions li>.editor_state_selector_container {
+	display: inline-block;
 
-#editor .editor_actions li>.action-ui-container>* {
-	display: inline !important;
-	vertical-align: baseline !important;
-	margin: 0 3px 0 0 !important;
-	padding: 0 !important;
-	font-size: inherit !important;
+	vertical-align: middle;
+
+	margin-left: 0;
+	margin-right: 4px;
+
+	margin-bottom: 2px;
+
+	padding: 0;
+
+	font-size: inherit;
 }
 
 #editor .editor_actions li>.action-ui-container>div {
@@ -431,29 +422,23 @@ body.is-resizing #editor_resizer {
 	margin-left: 10px;
 
 	display: block;
-	clear: both;
+
 }
 
 #editor .editor_actions li .editor_actions ul {
-	margin-left: 0px;
+	margin-left: 15px;
 
 	margin-top: 3px;
 	margin-bottom: 3px;
 }
 
-#editor .editor_actions li .editor_actions li>span,
-#editor .editor_actions li .editor_actions li>select,
-#editor .editor_actions li .editor_actions li>input.editor_number,
-#editor .editor_actions li .editor_actions li>.action-ui-container {
-	display: inline !important;
-	vertical-align: baseline !important;
-	margin: 0 3px 0 0 !important;
-	padding: 0 !important;
-	font-size: inherit !important;
-}
-
 #editor .editor_actions li>div:not(.delete_action):not(.editor_new_action_container) {
 	display: inline;
+
+
+
+
+
 }
 
 #editor li>span,
@@ -482,19 +467,22 @@ body.is-resizing #editor_resizer {
 }
 
 #editor li>div.delete_action {
-	/* Keep styles for position, size, opacity etc */
 	width: 16px;
 	height: 16px;
 	position: absolute;
 	left: -20px;
+
 	top: 50%;
+
 	transform: translateY(-50%);
+
 	cursor: pointer;
 	opacity: 0.3;
 	color: #000;
 	font-size: 14px;
 	line-height: 16px;
 	text-align: center;
+}
 
 #editor li>div.delete_action:hover {
 	opacity: 0.6;
@@ -504,10 +492,7 @@ body.is-resizing #editor_resizer {
 #editor .editor_new_action_container {
 	margin-left: -25px;
 
-	display: inline-block;
-	width: auto;
-	padding: 6px 14px;
-	white-space: nowrap;
+	display: block;
 
 	margin-top: 5px;
 }
@@ -761,29 +746,44 @@ body.is-resizing #editor_resizer {
 }
 
 #editor select {
-	/* Keep styles for auto width, minimal padding, simple border etc. */
+	max-width: none;
+
 	width: auto;
-	padding: 1px 20px 1px 4px;
+
+	padding: 2px 5px;
+
 	font-family: inherit;
+
 	font-size: inherit;
+
 	border: 1px solid #aaa;
+
 	border-radius: 3px;
+
 	background-color: #fff;
-	margin: 0 2px;
+
+	margin: 0 4px;
+
 	vertical-align: baseline;
+
 	-webkit-appearance: none;
+
 	-moz-appearance: none;
 	appearance: none;
-	background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23777%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.6-3.6%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
+
+	background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23aaa%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.6-3.6%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
 	background-repeat: no-repeat;
 	background-position: right 5px center;
 	background-size: 8px auto;
+	padding-right: 20px;
+
 	cursor: pointer;
 }
 
 #editor select:focus {
-	outline: 1px solid #aaa;
-	border-color: #888;
+	outline: 1px solid #6750a4;
+
+	border-color: #6750a4;
 }
 
 #editor div.proportions {
