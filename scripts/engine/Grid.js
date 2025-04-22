@@ -2,6 +2,59 @@
     // Singleton Class
     exports.Grid = {};
 
+	// Grid Array
+    Grid.array = [];
+    // DOM References (assuming these are still needed elsewhere)
+    Grid.dom = document.getElementById("grid");
+    Grid.bg = document.getElementById("grid_bg");
+    Grid.domContainer = document.getElementById("grid_container");
+    Grid.css = document.getElementById("grid_style");
+    Grid.tileSize = 1;
+
+
+    const _ensureProportionsMatchStates = () => {
+         // Guard clause: Check if necessary data exists
+         if (!Model.data?.world || !Model.data?.states) {
+             console.warn("_ensureProportionsMatchStates: Model data missing.");
+             return; // Exit if data isn't ready
+         }
+
+         // Ensure proportions is an array, default to empty if not
+         Model.data.world.proportions = Model.data.world.proportions || [];
+         const proportions = Model.data.world.proportions;
+         const states = Model.data.states;
+
+         const currentProportionStateIds = new Set(proportions.map(p => p.stateID));
+         const currentStateIds = new Set(states.map(s => s.id));
+
+         let changed = false;
+
+         // 1. Remove proportions for states that no longer exist
+         const initialLength = proportions.length;
+         // Filter in place (more complex but avoids reassignment issues)
+         let i = proportions.length;
+         while (i--) {
+             if (!currentStateIds.has(proportions[i].stateID)) {
+                 proportions.splice(i, 1);
+                 changed = true;
+             }
+         }
+
+         // 2. Add new proportions (with 0 parts) for states that were added
+         states.forEach(state => {
+             if (!currentProportionStateIds.has(state.id)) {
+                 proportions.push({ stateID: state.id, parts: 0 });
+                 changed = true;
+             }
+         });
+
+         if(changed) {
+             console.log("Grid: Proportions array updated to match current states.");
+             // Optional: Could trigger a UI update for the proportion sliders here if needed
+             // publish("/ui/proportionsUpdated");
+         }
+    };
+
     Grid.initialize = function () {
         console.log("Grid.initialize called."); // Add log
         // Grid size
