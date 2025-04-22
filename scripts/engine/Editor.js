@@ -297,7 +297,7 @@
 
     // Create Action Adder ("+ Add New Action" dropdown)
     Editor.createActionAdder = function (actionConfigs, domToUpdate) {
-        const keyValues = [{ name: "+ Add Action", value: "" }]; // Shorter text
+        const keyValues = [{ name: "+new", value: "" }]; // Shorter text
         if (window.Actions) {
             for (const key in Actions) {
                 if (Actions[key]?.name) {
