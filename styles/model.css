@@ -148,7 +148,7 @@ body.is-resizing #editor_resizer {
 
 
 	cursor: default;
-	border: 1px solid #888888;
+	border: 1px solid #bbbbbb;
 
 	box-sizing: content-box;
 
@@ -160,7 +160,7 @@ body.is-resizing #editor_resizer {
 
 
 	cursor: default;
-	border: 1px solid #828282;
+	border: 1px solid #bbbbbb;
 
 	box-sizing: content-box;
 }
@@ -434,11 +434,6 @@ body.is-resizing #editor_resizer {
 
 #editor .editor_actions li>div:not(.delete_action):not(.editor_new_action_container) {
 	display: inline;
-
-
-
-
-
 }
 
 #editor li>span,
@@ -492,7 +487,10 @@ body.is-resizing #editor_resizer {
 #editor .editor_new_action_container {
 	margin-left: -25px;
 
-	display: block;
+	display: inline-block;
+	width: auto;
+	padding: 6px 14px;
+	white-space: nowrap;
 
 	margin-top: 5px;
 }
