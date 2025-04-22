@@ -1,237 +1,238 @@
-/* styles/model.css */
-/* Basic Reset & Font */
 body {
 	margin: 0;
 	overflow: hidden;
 	display: flex;
-	/* Keep this, JS will set to block */
+
 	font-family: 'Roboto', 'OpenSansEmoji', Helvetica, Arial, sans-serif;
-	/* Add Roboto preference */
+
 	font-weight: 300;
-	/* Lighter default weight */
+
 	font-size: 16px;
 	background-color: #f8f8f8;
-	/* Lighter page background */
+
 	color: #1c1b1f;
-	/* Material 3 base text color */
+
 	height: 100vh;
 	display: flex;
-	/* Use flexbox for layout */
+
 }
 
-div, input, select, textarea, button {
+div,
+input,
+select,
+textarea,
+button {
 	box-sizing: border-box;
-	/* Better box model */
+
 	-webkit-user-select: none;
 	-moz-user-select: none;
 	-ms-user-select: none;
 	user-select: none;
 }
 
-/* Main Layout Containers */
 #grid_container {
-	/* width: 60%; */
-	/* Let flexbox handle width */
+
+
 	flex-grow: 1;
 	flex-shrink: 1;
 	min-width: 300px;
-	/* Take remaining space */
+
 	height: 100vh;
-	/* Full height minus play controls */
+
 	position: relative;
 	background-color: #e0e0e0;
-	/* Black background for grid area */
+
 	display: flex;
-	/* Center the grid */
+
 	justify-content: center;
 	align-items: center;
 	overflow: hidden;
-	/* Hide overflow if grid is larger */
+
 }
 
 #editor_container {
 	flex-basis: 380px;
-	/* Initial desired width */
+
 	flex-grow: 0;
-	/* Don't grow */
+
 	flex-shrink: 0;
-	/* Don't shrink by default */
+
 	min-width: 300px;
-	/* Minimum sensible width */
+
 	max-width: 70%;
-	/* Maximum sensible width (relative to viewport) */
+
 	height: 100vh;
-	/* Full height */
-	/* ... other editor_container styles ... */
+
+
 	position: relative !important;
-	/* Important for perfect-scrollbar */
+
 	overflow: hidden !important;
 }
 
 #editor_resizer {
 	flex-basis: 8px;
-	/* Width of the handle */
+
 	flex-grow: 0;
 	flex-shrink: 0;
 	height: 100vh;
-	/* Full height */
+
 	background-color: #cac4d0;
-	/* M3 Outline / Divider color */
+
 	cursor: col-resize;
-	/* Indicate horizontal resizing */
+
 	transition: background-color 0.2s ease;
 	z-index: 5;
-	/* Above grid/editor background, below controls? */
+
 }
 
 #editor_resizer:hover {
 	background-color: #79747e;
-	/* Darker on hover */
+
 }
 
 #editor_resizer:active {
 	background-color: #6750a4;
-	/* Primary color when dragging */
+
 }
 
 body.is-resizing {
 	cursor: col-resize;
-	/* Change cursor for whole page */
+
 	user-select: none;
-	/* Disable text selection */
+
 	-webkit-user-select: none;
 	-moz-user-select: none;
 	-ms-user-select: none;
 }
 
 body.is-resizing * {
-	/* Apply to children too */
+
 	pointer-events: none;
-	/* Prevent interaction with other elements during resize */
+
 }
 
-/* Allow interaction ONLY with the resizer itself during resize */
 body.is-resizing #editor_resizer {
 	pointer-events: auto;
 }
 
 #play_container {
-	/* width: 60%; */
-	/* Let flexbox handle */
+
+
 	flex-grow: 1;
 	height: 60px;
-	/* Slightly taller controls */
+
 	position: fixed;
-	/* Fixed at bottom */
+
 	left: 0;
 	bottom: 0;
 	background-color: #e7e0ec;
-	/* M3 Surface Container High */
+
 	border-top: 1px solid #cac4d0;
-	/* Divider */
+
 	color: #49454f;
-	/* M3 On Surface Variant */
+
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	padding: 0 20px;
-	/* Padding */
+
 	z-index: 10;
-	/* Above grid */
+
 	width: 100%;
 	box-sizing: border-box;
 }
 
-
-/***************
-THE GRID
-***************/
-#grid, #grid_bg {
+#grid_bg {
 	position: absolute;
-	/* Keep absolute positioning within centered container */
-	/* margin: auto; top:0; left:0; right:0; bottom:0; */
-	/* Handled by flexbox parent now */
+
+
+
 	cursor: default;
 	border: 1px solid #888888;
-	/* Darker border for grid */
+
 	box-sizing: content-box;
-	/* Make border outside */
+
+}
+
+#grid {
+	position: absolute;
+
+
+
+	cursor: default;
+	border: 1px solid #303030;
+
+	box-sizing: content-box;
 }
 
 #grid>div>div {
-	/* Cell */
+
 	float: left;
 	line-height: 1em;
-	/* Keep for vertical align */
+
 	text-align: center;
 	display: flex;
-	/* Center emoji better */
+
 	justify-content: center;
 	align-items: center;
 	color: #e0e0e0;
-	/* White emoji on black */
+
 }
 
 #grid_bg>div {
-	/* BG Cell */
+
 	position: absolute;
 	border: 1px solid #222222;
-	/* Very dark grid lines */
-	/* Remove background color from here */
+
+
 	box-sizing: border-box;
 }
 
-/* #grid_bg is now handled by #grid_container */
-
 .ps-container {
-	/* Apply this class via JS if needed, or target #editor directly */
+
 	-ms-touch-action: none;
 	touch-action: none;
 	overflow: hidden !important;
 	position: relative;
 }
 
-/***************
-THE EDITOR
-***************/
 #editor {
-	/* This should be the direct child */
+
 	height: 100%;
-	/* MUST have height for Ps */
+
 	width: 100%;
-	/* MUST have width */
+
 	overflow: auto;
-	/* Ps adds its own scrollbars */
+
 	padding: 20px;
-	/* Keep padding */
+
 	box-sizing: border-box;
-	/* Include padding in size */
+
 	position: relative;
-	/* Might help Ps */
+
 }
 
 #editor .editor_title {
 	font-size: 24px;
-	/* Slightly smaller */
+
 	margin-bottom: 20px;
 	color: #1d192b;
-	/* M3 Primary */
+
 	font-weight: 400;
 }
 
 #editor .editor_title span {
 	font-weight: 500;
-	/* Medium weight */
+
 }
 
-/* Title Input (Replaces Description) */
 #editor .editor_main_title_input {
 	font-family: 'Roboto', 'OpenSansEmoji', Helvetica, Arial, sans-serif;
 	font-weight: 400;
 	font-size: 24px;
 	border: none;
 	border-bottom: 2px solid #6750a4;
-	/* M3 Primary */
+
 	background: none;
 	width: 100%;
 	padding: 8px 0;
@@ -242,42 +243,41 @@ THE EDITOR
 
 #editor .editor_main_title_input:focus {
 	border-bottom-color: #4f378b;
-	/* Darker primary */
+
 }
 
-/* State Container */
 #editor .editor_state {
 	margin-bottom: 20px;
 	background-color: #fffbfe;
-	/* M3 Surface */
+
 	border-radius: 12px;
-	/* Rounded corners */
+
 	padding: 10px 15px;
 	border: 1px solid #cac4d0;
-	/* Outline */
+
 	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-	/* Subtle elevation */
+
 }
 
 #editor .editor_state_header {
 	display: flex;
 	align-items: baseline;
-	/* Align text baselines */
+
 	gap: 5px;
 	margin-bottom: 5px;
-	/* Less space */
+
 }
 
 #editor input.editor_icon {
 	font-size: 24px;
-	/* Slightly smaller icon maybe */
+
 	width: 36px;
 	height: 36px;
 	line-height: 34px;
-	/* Adjust for border */
+
 	margin-right: 5px;
-	/* Less space */
-	/* Revert M3 styles if desired */
+
+
 	background: #eee;
 	border: 1px solid #ccc;
 	border-radius: 3px;
@@ -285,12 +285,12 @@ THE EDITOR
 
 #editor input[type=text].editor_name {
 	font-size: 16px;
-	/* Smaller name */
+
 	height: 30px;
-	/* Shorter input */
+
 	padding: 2px 5px;
 	flex-grow: 1;
-	/* Keep taking space */
+
 	border: 1px solid #ccc;
 	border-radius: 3px;
 	background-color: #fff;
@@ -298,17 +298,17 @@ THE EDITOR
 
 #editor div.delete_state {
 	width: 25px;
-	/* Smaller */
+
 	height: 25px;
 	font-size: 20px;
-	/* Smaller icon */
+
 	line-height: 25px;
 	opacity: 0.3;
 	color: #000;
 	margin-left: 5px;
 	align-self: center;
-	/* Center vertically */
-	/* Revert M3 styles */
+
+
 	border-radius: 0;
 	background: none;
 }
@@ -316,65 +316,63 @@ THE EDITOR
 #editor div.delete_state:hover {
 	opacity: 1;
 	background-color: #fdeded;
-	/* M3 Error Container (ish) */
+
 }
 
-/* State Description Textarea (Removed, but keeping style for other textareas) */
-#editor textarea, #editor .editor_textarea {
+#editor textarea,
+#editor .editor_textarea {
 	font-family: 'Roboto', 'OpenSansEmoji', Helvetica, Arial, sans-serif;
 	font-weight: 300;
 	font-size: 14px;
-	/* Smaller text */
+
 	background: #f3f0f4;
-	/* M3 Surface Container Low */
+
 	margin: 10px 0;
 	border: 1px solid #cac4d0;
 	border-radius: 8px;
-	/* Rounded */
+
 	width: 100%;
 	resize: none;
 	overflow: hidden;
-	/* Keep hiding scrollbar */
+
 	padding: 10px;
 	color: #49454f;
 	line-height: 1.4;
 }
 
-#editor textarea:focus, #editor .editor_textarea:focus {
+#editor textarea:focus,
+#editor .editor_textarea:focus {
 	outline: none;
 	border-color: #6750a4;
 }
 
-
-/* Action Number Input */
 #editor input[type=text].editor_number {
 	font-size: inherit;
 	width: 45px;
-	/* Keep reasonably small width */
+
 	cursor: col-resize;
 	border: none;
 	border-bottom: 1px dotted #aaa;
-	/* Dotted underline */
+
 	border-radius: 0;
 	background: none;
 	text-align: center;
 	padding: 1px 0;
 	margin: 0 4px;
-	/* Horizontal margin */
+
 	vertical-align: baseline;
 	display: inline;
 }
 
 #editor input[type=text].editor_number:focus {
 	border-bottom: 1px solid #6750a4;
-	/* Solid underline on focus */
+
 	outline: none;
 }
 
-/* Action UI List */
 #editor .editor_actions ul {
 	margin: 5px 0 5px 25px;
-	/* Reduced top/bottom margin */
+
 	padding-left: 0;
 	list-style-type: none;
 	position: relative;
@@ -383,15 +381,15 @@ THE EDITOR
 
 #editor .editor_actions li {
 	padding: 2px 0 2px 10px;
-	/* Reduced padding, keep left padding for indent */
+
 	margin-bottom: 3px;
-	/* Reduced spacing */
+
 	display: block;
-	/* LI itself is block */
+
 	line-height: 1.5;
-	/* Adjust line height */
+
 	position: relative;
-	/* Needed for delete button */
+
 	min-height: 22px;
 }
 
@@ -400,16 +398,16 @@ THE EDITOR
 #editor .editor_actions li>input[type=text].editor_number,
 #editor .editor_actions li>.editor_state_selector_container {
 	display: inline-block;
-	/* Use inline-block for better spacing control */
+
 	vertical-align: middle;
-	/* Align vertically */
+
 	margin-left: 0;
 	margin-right: 4px;
-	/* Space between inline elements */
+
 	margin-bottom: 2px;
-	/* Allow slight wrap spacing */
+
 	padding: 0;
-	/* Reset padding */
+
 	font-size: inherit;
 }
 
@@ -421,47 +419,42 @@ THE EDITOR
 	margin-top: 3px;
 	margin-bottom: 3px;
 	margin-left: 10px;
-	/* Slightly less indent */
+
 	display: block;
-	/* Ensure nested container is block */
+
 }
 
 #editor .editor_actions li .editor_actions ul {
 	margin-left: 15px;
-	/* Indent items within nested list */
+
 	margin-top: 3px;
 	margin-bottom: 3px;
 }
 
-
 #editor .editor_actions li>div:not(.delete_action):not(.editor_new_action_container) {
 	display: inline;
-	/* Try forcing simple inline first */
-	/* If inline causes issues, try inline-block: */
-	/* display: inline-block; */
-	/* vertical-align: middle; */
-	/* margin-right: 5px; */
+
+
+
+
+
 }
 
 #editor li>span,
-/* Labels */
-#editor li>div:not(.delete_action):not(.editor_new_action_container)
 
-/* Action UI containers */
-	{
+#editor li>div:not(.delete_action):not(.editor_new_action_container) {
 	margin-left: 0px;
-	/* Remove forced indent */
+
 	flex-grow: 0;
-	/* Don't force grow */
+
 	display: inline;
-	/* Ensure inline */
+
 	margin-right: 4px;
-	/* Space after labels */
+
 }
 
-/* Add slight bottom margin specifically to nested action UIs if needed */
 #editor .editor_actions li .editor_actions {
-	/* Nested actions */
+
 	margin-top: 5px;
 	margin-bottom: 5px;
 }
@@ -469,7 +462,7 @@ THE EDITOR
 #editor li>select,
 #editor li>input[type=text].editor_number {
 	margin-left: 0;
-	/* Remove extra space */
+
 }
 
 #editor li>div.delete_action {
@@ -477,11 +470,11 @@ THE EDITOR
 	height: 16px;
 	position: absolute;
 	left: -20px;
-	/* Align left of LI content */
+
 	top: 50%;
-	/* Center vertically */
+
 	transform: translateY(-50%);
-	/* Fine-tune centering */
+
 	cursor: pointer;
 	opacity: 0.3;
 	color: #000;
@@ -492,89 +485,88 @@ THE EDITOR
 
 #editor li>div.delete_action:hover {
 	opacity: 0.6;
-	/* Original hover */
+
 }
 
 #editor .editor_new_action_container {
 	margin-left: -25px;
-	/* Align with delete button */
+
 	display: block;
-	/* Put on its own line potentially */
+
 	margin-top: 5px;
 }
 
 #editor .editor_new_action_select {
-	/* Target the select directly */
-	/* Reset M3 styles */
+
+
 	opacity: 1;
 	position: static;
 	height: auto;
 	padding: 2px 5px;
-	/* Minimal padding */
+
 	border: 1px solid #aaa;
-	/* Simple border */
+
 	border-radius: 3px;
-	/* Slight rounding */
+
 	font-family: inherit;
 	font-weight: normal;
-	/* Normal weight */
+
 	font-size: 12px;
-	/* Smaller like original? */
+
 	line-height: normal;
 	color: #555;
-	/* Grey text */
+
 	background-color: #f0f0f0;
-	/* Light grey background */
+
 	cursor: pointer;
 	transition: background-color 0.2s;
 	-webkit-appearance: none;
 	-moz-appearance: none;
 	appearance: none;
 	background-image: none;
-	/* Remove arrow */
+
 	display: inline-block;
-	/* Make inline */
+
 }
 
 #editor .editor_new_action_select:hover {
 	background-color: #e0e0e0;
-	/* Darker grey hover */
+
 }
 
-/* Add Action Button */
 #editor .editor_new_action {
 	width: auto;
 	height: auto;
-	/* Let content determine height */
+
 	display: inline-block;
 	margin-top: 0;
-	/* Remove top margin */
+
 	margin-left: -30px;
-	/* Use negative margin to align like delete button */
-	/* Reset position for the select */
+
+
 	position: relative;
 }
 
 #editor .editor_new_action div {
-	/* The visible button part */
+
 	width: auto;
 	height: 30px;
 	padding: 0 12px;
 	border: 1px solid #79747e;
-	/* Outline */
+
 	border-radius: 15px;
-	/* Pill shape */
+
 	position: absolute;
 	font-family: 'Roboto', 'OpenSansEmoji', Helvetica, Arial, sans-serif;
 	font-weight: 400;
 	font-size: 14px;
 	line-height: 28px;
-	/* Center text */
+
 	text-align: center;
 	color: #6750a4;
-	/* Primary */
+
 	background-color: #fffbfe;
-	/* Surface */
+
 	cursor: pointer;
 	transition: background-color 0.2s;
 	display: none;
@@ -582,98 +574,96 @@ THE EDITOR
 
 #editor .editor_new_action div:hover {
 	background-color: #e8def8;
-	/* Primary container (hover) */
+
 }
 
 #editor .editor_new_action select {
-	/* Reset opacity */
+
 	opacity: 1;
 	position: static;
-	/* Remove absolute positioning */
+
 	width: auto;
-	/* Auto width */
+
 	height: 32px;
-	/* Button height */
+
 	padding: 0 12px;
 	border: 1px solid #79747e;
-	/* Outline */
+
 	border-radius: 16px;
-	/* Pill shape */
+
 	font-family: 'Roboto', 'OpenSansEmoji', Helvetica, Arial, sans-serif;
 	font-weight: 500;
-	/* Medium weight */
+
 	font-size: 14px;
 	line-height: 30px;
-	/* Center text */
+
 	color: #6750a4;
-	/* Primary */
+
 	background-color: #fffbfe;
-	/* Surface */
+
 	cursor: pointer;
 	transition: background-color 0.2s;
-	/* Add appearance none for consistent look */
+
 	-webkit-appearance: none;
 	-moz-appearance: none;
 	appearance: none;
-	/* Remove default arrow */
+
 	display: inline-block;
-	/* Make it inline */
+
 }
 
 #editor .editor_new_action select:hover {
 	background-color: #e8def8;
-	/* Primary container (hover) */
+
 }
 
-/* Generic Fancy Button */
 #editor .editor_fancy_button {
 	border-radius: 3px;
-	/* Less rounded */
+
 	min-width: auto;
-	/* Remove min width */
+
 	width: auto;
-	/* Auto width */
+
 	padding: 5px 10px;
-	/* Smaller padding */
+
 	height: auto;
-	/* Auto height */
+
 	background: #ddd;
-	/* Grey background */
+
 	font-weight: normal;
-	/* Normal weight */
+
 	font-size: 14px;
-	/* Adjust size */
+
 	line-height: normal;
-	/* Normal line height */
+
 	color: #333;
-	/* Dark text */
+
 	cursor: pointer;
 	display: inline-flex;
 	align-items: center;
 	text-align: left;
-	/* Align text left */
+
 	border: 1px solid #ccc;
-	/* Add border */
+
 	transition: background-color 0.2s;
 	margin-bottom: 10px;
-	/* Adjust spacing */
+
 	box-shadow: none;
-	/* Remove shadow */
+
 }
 
 #editor .editor_fancy_button:hover {
 	background: #ccc;
-	/* Darker grey hover */
+
 	box-shadow: none;
 }
 
-/* Icon inside button */
 #editor .editor_fancy_button span.button-icon {
 	font-size: 16px;
-	/* Adjust icon size */
+
 	margin-right: 5px;
-	/* Space */
-	/* Reset M3 specifics */
+
+
 	border-right: none;
 	line-height: inherit;
 	height: auto;
@@ -687,7 +677,7 @@ THE EDITOR
 #editor .editor_fancy_button#export_model_button,
 #editor .editor_fancy_button#import_model_button {
 	background: #ddd;
-	/* Revert to grey */
+
 	color: #333;
 }
 
@@ -697,13 +687,11 @@ THE EDITOR
 	background: #ccc;
 }
 
-
-/* Save/Load Section */
 #editor .editor_save_load_section {
 	margin-top: 25px;
 	padding: 15px;
 	background-color: #e7e0ec;
-	/* Surface Container High */
+
 	border-radius: 12px;
 	border: 1px solid #cac4d0;
 }
@@ -721,98 +709,93 @@ THE EDITOR
 }
 
 #editor .importExportRow {
-	/* Give the container an ID or class */
+
 	display: flex;
 	gap: 10px;
 	flex-wrap: wrap;
-	/* Allow buttons to wrap */
+
 	margin-bottom: 15px;
-	/* Add space below */
+
 }
 
-/* Input Fields (URL, Save Name) */
 #editor input.editor_text_input {
-	/* General text input */
+
 	width: 100%;
 	font-size: 14px;
 	padding: 10px;
 	border: 1px solid #79747e;
-	/* Outline */
+
 	border-radius: 4px;
-	/* M3 standard */
+
 	margin-bottom: 10px;
 	background-color: #fffbfe;
-	/* Surface */
+
 }
 
 #editor input.editor_text_input[readonly] {
 	background-color: #f3f0f4;
-	/* Surface Container Low */
+
 	cursor: default;
 }
 
 #editor input.editor_text_input:focus {
 	outline: none;
 	border-color: #6750a4;
-	/* Primary */
+
 }
 
-/* Dropdown (Select) */
 #editor select {
 	max-width: none;
-	/* Remove max-width */
+
 	width: auto;
-	/* Auto width based on content */
+
 	padding: 2px 5px;
-	/* Minimal padding */
+
 	font-family: inherit;
-	/* Use editor font */
+
 	font-size: inherit;
-	/* Use editor font size */
+
 	border: 1px solid #aaa;
-	/* Simple border */
+
 	border-radius: 3px;
-	/* Slight rounding */
+
 	background-color: #fff;
-	/* White background */
+
 	margin: 0 4px;
-	/* Horizontal margin */
+
 	vertical-align: baseline;
-	/* Align with text */
+
 	-webkit-appearance: none;
-	/* Minimal appearance */
+
 	-moz-appearance: none;
 	appearance: none;
-	/* Simple arrow */
+
 	background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23aaa%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.6-3.6%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E');
 	background-repeat: no-repeat;
 	background-position: right 5px center;
 	background-size: 8px auto;
 	padding-right: 20px;
-	/* Space for arrow */
+
 	cursor: pointer;
 }
 
 #editor select:focus {
 	outline: 1px solid #6750a4;
-	/* Simple focus */
+
 	border-color: #6750a4;
 }
 
-
-/* Proportions Sliders */
 #editor div.proportions {
 	overflow: visible !important;
-	/* Override any hidden overflow */
+
 	margin-top: 10px;
-	border: 1px dashed orange;
-	/* TEMPORARY: Make it visible */
+
 	padding: 5px;
-	/* Add padding for visibility */
+
 	min-height: 20px;
-	/* Ensure it has some height */
+
 	display: block !important;
-	/* Ensure it's block */
+
 	visibility: visible !important;
 	opacity: 1 !important;
 }
@@ -834,7 +817,7 @@ THE EDITOR
 	align-items: center;
 	margin-right: 10px;
 	font-size: 16px;
-	/* Adjusted size */
+
 	flex-shrink: 0;
 	visibility: visible !important;
 	opacity: 1 !important;
@@ -850,24 +833,22 @@ THE EDITOR
 	border-radius: 4px;
 	outline: none;
 	display: block;
-	/* Make sure it displays */
+
 	visibility: visible !important;
 	opacity: 1 !important;
 }
 
-/* Chrome/Safari Thumb */
 #editor div.proportions>div>input[type=range]::-webkit-slider-thumb {
 	-webkit-appearance: none;
 	appearance: none;
 	width: 18px;
 	height: 18px;
 	background: #6750a4;
-	/* M3 Thumb */
+
 	border-radius: 50%;
 	cursor: pointer;
 }
 
-/* Firefox Thumb */
 #editor div.proportions>div>input[type=range]::-moz-range-thumb {
 	width: 18px;
 	height: 18px;
@@ -877,22 +858,19 @@ THE EDITOR
 	border: none;
 }
 
-
-/* Divider Line */
 #editor hr {
 	margin: 30px 0;
-	/* Adjust spacing */
+
 	border: none;
 	height: 1px;
 	background-color: #cac4d0;
-	/* M3 Outline */
+
 }
 
-/* Helper text/labels */
 #editor .editor_label {
 	font-size: 12px;
 	color: #49454f;
-	/* On Surface Variant */
+
 	display: block;
 	margin-bottom: 5px;
 	line-height: 1.3;
@@ -900,7 +878,7 @@ THE EDITOR
 
 #editor .editor_label a {
 	color: #6750a4;
-	/* Primary */
+
 	text-decoration: none;
 }
 
@@ -908,129 +886,123 @@ THE EDITOR
 	text-decoration: underline;
 }
 
-/* Credits */
 #editor .credits_label {
 	font-size: 14px;
-	/* Adjust size */
+
 	color: #49454f;
 	margin: 30px 0;
 	line-height: 1.5;
 }
 
-#editor li>span, #editor li>div:not(.delete_action) {
-	/* This targets the action's generated UI (like labels, selectors) */
+#editor li>span,
+#editor li>div:not(.delete_action) {
+
 	margin-left: 10px;
-	/* Add space after delete button area */
+
 	flex-grow: 1;
-	/* Allow action content to take space */
+
 }
 
-/***************
-THE PLAY CONTROLS
-***************/
 #play_controls {
 	width: auto;
-	/* Auto width */
+
 	max-width: 500px;
-	/* Max width */
+
 	height: 40px;
-	/* margin: 0 auto; */
-	/* Centered by parent */
+
+
 	overflow: hidden;
 	display: flex;
-	/* Use flex */
+
 	align-items: center;
 	gap: 8px;
-	/* Spacing between controls */
+
 }
 
 #play_controls>div {
-	/* float: left; */
-	/* Remove float */
+
+
 	flex-shrink: 0;
-	/* Prevent shrinking */
+
 }
 
-/* Control Buttons (Reset, Pause, Step, Draw) */
 #play_controls>.control_button {
 	background: #e8def8;
-	/* Primary Container */
+
 	color: #1d192b;
-	/* On Primary Container */
+
 	border: 1px solid #cac4d0;
 	border-radius: 50%;
-	/* Make buttons circular */
-	/* padding: 0 15px; */
-	/* Remove padding */
+
+
+
 	width: 40px;
-	/* Fixed width for circle */
+
 	height: 40px;
-	/* line-height: 38px; */
-	/* Remove line-height */
-	/* text-align: center; */
-	/* Handled by flex */
+
+
+
+
 	font-weight: normal;
-	/* Icons don't need weight */
+
 	font-size: 20px;
-	/* Icon size */
+
 	transition: background-color 0.2s;
 	cursor: pointer;
 	display: inline-flex;
-	/* Use inline-flex */
+
 	align-items: center;
 	justify-content: center;
-	/* Reset specific widths */
+
 }
 
 #play_controls>.control_button>.material-symbols-outlined {
 	font-size: 24px;
-	/* Material symbol size */
+
 	line-height: 1;
 	display: block;
 	width: 24px;
-	/* Match icon size */
+
 	height: 24px;
-	/* Match icon size */
+
 	overflow: hidden;
-	/* Hide text overflow if any */
+
 	font-variation-settings:
-		/* Optional: Fine-tune icon style */
-		'FILL'0,
-		'wght'400,
-		'GRAD'0,
-		'opsz'24;
+
+		'FILL' 0,
+		'wght' 400,
+		'GRAD' 0,
+		'opsz' 24;
 	visibility: visible;
 
 }
 
 #play_controls>.control_button:hover {
 	background: #d8cde0;
-	/* Darker hover */
+
 }
 
 #play_controls>.control_button:active {
 	background: #ccc1d6;
-	/* Even darker active */
+
 }
 
-
-/* Speed Control */
 #play_controls>.control_speed {
 	width: 130px;
 	height: 40px;
-	/* Ensure consistent height */
+
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
 	margin: 0 8px;
-	/* Consistent margin */
+
 	padding: 0;
-	/* Remove padding */
+
 	box-sizing: border-box;
-	/* Explicitly visible */
+
 	opacity: 1 !important;
-	/* Explicitly opaque */
+
 	visibility: visible !important;
 	overflow: visible;
 }
@@ -1039,7 +1011,7 @@ THE PLAY CONTROLS
 	width: 100%;
 	height: 8px;
 	margin: 0 0 4px 0;
-	/* Add margin below */
+
 	cursor: pointer;
 	-webkit-appearance: none;
 	appearance: auto;
@@ -1047,14 +1019,13 @@ THE PLAY CONTROLS
 	border-radius: 4px;
 	outline: none;
 	display: block;
-	/* Make sure it's block */
+
 	visibility: visible !important;
-	/* Explicitly visible */
+
 	opacity: 1;
-	/* Explicitly opaque */
+
 }
 
-/* Thumb styles should already be defined - check them */
 #play_controls>.control_speed>input[type=range]::-webkit-slider-thumb {
 	-webkit-appearance: none;
 	appearance: none;
@@ -1062,21 +1033,21 @@ THE PLAY CONTROLS
 	border-radius: 50%;
 	cursor: pointer;
 	margin-top: -4px;
-	/* Adjust vertical alignment if needed */
+
 	visibility: visible;
-	/* Explicitly visible */
+
 	opacity: 1;
-	/* Explicitly opaque */
+
 	width: 16px;
 	height: 16px;
 }
 
 #play_controls>.control_speed>input[type=range]::-moz-range-thumb {
-	/* ... keep thumb styles ... */
+
 	visibility: visible;
-	/* Explicitly visible */
+
 	opacity: 1;
-	/* Explicitly opaque */
+
 	width: 16px;
 	height: 16px;
 }
@@ -1090,38 +1061,31 @@ THE PLAY CONTROLS
 	padding: 0 2px;
 	line-height: 1;
 	visibility: visible;
-	/* Explicitly visible */
+
 	opacity: 1;
-	/* Explicitly opaque */
+
 }
 
-/* Ensure float is removed from labels if it was there */
 #play_controls>.control_speed>.speed_labels>div {
 	float: none !important;
 }
 
-/* Specific Button Widths (Removed - use padding) */
-/* #play_controls > #play_reset { width: 50px; } */
-/* #play_controls > #play_pause { width: 50px; } */
-/* #play_controls > #play_step { width: 40px; } */
-/* #play_controls > #play_draw { width: 80px; } */
-
 #play_controls>#play_draw {
-	/* Keep general button styles */
+
 	display: inline-flex;
-	/* Align items */
+
 	align-items: center;
 	width: auto;
-	/* Auto width */
+
 	padding: 0 10px 0 5px;
-	/* Adjust padding L/R */
+
 	border-radius: 20px;
-	/* Keep pill shape for this one? */
+
 }
 
 #play_controls>#play_draw>.material-symbols-outlined {
 	margin-right: 5px;
-	/* Space between icon and emoji */
+
 }
 
 #play_controls>#play_draw>#play_draw_icon_container {
@@ -1131,73 +1095,60 @@ THE PLAY CONTROLS
 	font-size: 20px;
 	border-radius: 4px;
 	line-height: 24px;
-	/* Adjust for border */
+
 	text-align: center;
-	/* margin-left: 8px; */
-	/* Removed, use gap on parent? */
+
+
 	background: #fffbfe;
 	display: inline-flex;
 	justify-content: center;
 	align-items: center;
 	overflow: hidden;
-	/* Hide overflowing emoji parts */
+
 	visibility: visible;
 }
 
-
-/* Paused state */
 #play_controls>#play_pause[paused=true] {
 	background: #6750a4;
-	/* Primary */
+
 	color: #ffffff;
-	/* On Primary */
+
 	border-color: #6750a4;
 }
 
 #play_controls>#play_pause[paused=true]>.material-symbols-outlined {
 	color: #ffffff;
-	/* Ensure icon is white too */
+
 }
 
 #play_controls>#play_pause[paused=true]:hover {
 	background: #5a4591;
-	/* Darker */
+
 }
 
-/* Draw Button Icon */
 #play_controls>#play_draw>div {
-	/* float: right; */
-	/* Remove float */
+
+
 	width: 24px;
-	/* Smaller icon */
+
 	height: 24px;
 	border: 1px solid #79747e;
-	/* Outline variant */
+
 	font-size: 18px;
-	/* Smaller emoji */
+
 	border-radius: 4px;
-	/* Less rounded */
+
 	line-height: 22px;
-	/* Adjust for border */
+
 	text-align: center;
 	margin-left: 8px;
-	/* Space from text */
+
 	background: #fffbfe;
-	/* Surface */
+
 	display: inline-flex;
-	/* Keep using flex */
+
 	justify-content: center;
 	align-items: center;
-}
-
-/* Basic Play Controls (Hide Speed/Step) */
-#play_controls[basic] {
-	/* width: 275px; */
-	/* Remove fixed width */
-}
-
-#play_controls[basic]>.control_speed {
-	/* display: none; */
 }
 
 #play_controls[basic]>#play_step {
@@ -1205,15 +1156,13 @@ THE PLAY CONTROLS
 }
 
 #play_controls[basic]>.control_divider:nth-of-type(2) {
-	/* Hide second divider */
+
 	display: none;
 }
 
-
-/* Link Styles */
 a {
 	color: #6750a4;
-	/* Primary color for links */
+
 	text-decoration: none;
 }
 
@@ -1221,7 +1170,6 @@ a:hover {
 	text-decoration: underline;
 }
 
-/* Hide the ugly file input */
 #importFile {
 	display: none;
 }

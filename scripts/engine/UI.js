@@ -156,45 +156,48 @@
     const play_reset = document.getElementById("play_reset");
     if (play_reset) {
         play_reset.onclick = function () {
-            console.log("UI: Clearing grid...");
+            // Optional confirmation
+            if (
+                window.hasUnsavedChanges &&
+                !confirm(
+                    "Reset grid using current proportions? This will discard the current grid state."
+                )
+            ) {
+                return; // Don't reset if user cancels
+            }
+
+            console.log("UI: Reinitializing grid based on current settings...");
 
             // Check if Grid and Model are ready
-            if (window.Grid && Grid.array && window.Model) {
-                // Iterate through the grid and set all agents to state 0
-                for (let y = 0; y < Grid.array.length; y++) {
-                    if (Grid.array[y]) { // Check if row exists
-                        for (let x = 0; x < Grid.array[y].length; x++) {
-                             const agent = Grid.array[y][x];
-                             if (agent) { // Check if agent exists
-                                 agent.forceState(0); // Force state to 0 (empty)
-                             }
-                        }
-                    }
-                }
+            if (window.Grid && window.Model) {
+                // *** CALL Grid.reinitialize() ***
+                // This function handles:
+                // 1. Creating new agents based on current Model.data.world.size
+                // 2. Populating them based on Model.data.world.proportions
+                // 3. Calling necessary updates like publish("/grid/updateSize") and publish("/grid/updateAgents")
+                Grid.reinitialize();
 
-                // Update the visual display
-                publish("/grid/updateAgents");
-
-                // Mark this action as an unsaved change
+                // Mark this action as an unsaved change (as the grid state changed)
                 window.hasUnsavedChanges = true;
 
-                // Update the URL to reflect the cleared grid state (if grid state saving is enabled)
-                // Or just update URL based on rules if grid state saving is off
+                // Update the URL
                 Save.updateURL();
 
                 // Notify user
-                publish("/notify/info", ["Grid cleared."]);
+                publish("/notify/info", [
+                    "Grid reset using current proportions.",
+                ]);
 
-                // Optionally pause the simulation when clearing?
-                 if (Model.isPlaying) {
-                     Model.pause();
-                     updatePauseUI(); // Update button visual
-                 }
-
-
+                // Optionally pause the simulation upon reset
+                if (Model.isPlaying) {
+                    Model.pause();
+                    updatePauseUI(); // Ensure helper function exists and is called
+                }
             } else {
-                console.error("UI: Cannot clear grid - Grid or Model not ready.");
-                publish("/notify/error", ["Error clearing grid."]);
+                console.error(
+                    "UI: Cannot reinitialize grid - Grid or Model not ready."
+                );
+                publish("/notify/error", ["Error resetting grid."]);
             }
         };
     }
