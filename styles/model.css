@@ -173,6 +173,7 @@ body.is-resizing #editor_resizer {
 	text-align: center;
 	display: flex;
 
+	border: 1px solid #303030;
 	justify-content: center;
 	align-items: center;
 	color: #303030;
